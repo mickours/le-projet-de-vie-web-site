@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const loginSection = document.getElementById('login-section');
     const userInfo = document.getElementById('user-info');
+    const userDisplay = document.getElementById('user-display');
+    const loginNavBtn = document.getElementById('login-nav-btn');
     const usernameDisplay = document.getElementById('username-display');
     const avatarDisplay = document.getElementById('avatar-display');
     const logoutBtn = document.getElementById('logout-btn');
@@ -66,12 +68,21 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('token');
         token = null;
         currentUser = null;
-        userInfo.classList.add('hidden');
-        loginSection.classList.remove('hidden');
-        views.forEach(v => v.classList.add('hidden'));
+        userDisplay.classList.add('hidden');
+        logoutBtn.classList.add('hidden');
+        loginNavBtn.classList.remove('hidden');
+        
+        // Reset navigation to safe home
+        switchView('home');
     };
 
     const switchView = (viewId, updateHistory = true) => {
+        // Restrictions for guests
+        if (!token && (viewId === 'dossier' || viewId === 'profile')) {
+            switchView('login');
+            return;
+        }
+
         views.forEach(v => v.classList.add('hidden'));
         const target = document.getElementById(`${viewId}-section`);
         if (target) target.classList.remove('hidden');
@@ -127,14 +138,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         const view = path.replace('/', '') || 'home';
-        const validViews = ['home', 'activities', 'dossier', 'profile'];
+        const validViews = ['home', 'activities', 'dossier', 'profile', 'login'];
         switchView(validViews.includes(view) ? view : 'home', false);
     };
 
     const showApp = (user) => {
         currentUser = user;
         loginSection.classList.add('hidden');
-        userInfo.classList.remove('hidden');
+        userDisplay.classList.remove('hidden');
+        logoutBtn.classList.remove('hidden');
+        loginNavBtn.classList.add('hidden');
+        
         usernameDisplay.textContent = user.username;
         avatarDisplay.textContent = user.avatar || '👤';
         currentRole.textContent = user.role ? user.role.label : 'Utilisateur';
@@ -280,10 +294,27 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
 
-        const dossier = await (await apiFetch('/dossier')).json();
-        const track = dossier.find(t => t.activity_id == id);
-        questCompleted.checked = track ? track.is_completed : false;
-        questNotes.value = track ? (track.notes || '') : '';
+        // Progression & Interaction based on Auth
+        const authActions = document.getElementById('authenticated-actions');
+        const guestActions = document.getElementById('guest-actions');
+        const guestCommentMsg = document.getElementById('guest-comment-msg');
+
+        if (token) {
+            authActions.classList.remove('hidden');
+            guestActions.classList.add('hidden');
+            commentForm.classList.remove('hidden');
+            guestCommentMsg.classList.add('hidden');
+
+            const dossier = await (await apiFetch('/dossier')).json();
+            const track = dossier.find(t => t.activity_id == id);
+            questCompleted.checked = track ? track.is_completed : false;
+            questNotes.value = track ? (track.notes || '') : '';
+        } else {
+            authActions.classList.add('hidden');
+            guestActions.classList.remove('hidden');
+            commentForm.classList.add('hidden');
+            guestCommentMsg.classList.remove('hidden');
+        }
 
         loadComments(id);
         switchView('activity-detail');
@@ -440,6 +471,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     logoutBtn.addEventListener('click', logout);
+    loginNavBtn.addEventListener('click', () => switchView('login'));
+    
+    document.querySelectorAll('.start-adventure-btn').forEach(btn => {
+        btn.addEventListener('click', () => switchView('login'));
+    });
 
     navButtons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -481,6 +517,13 @@ document.addEventListener('DOMContentLoaded', () => {
         apiFetch('/users/me')
             .then(res => res.json())
             .then(user => showApp(user))
-            .catch(() => logout());
+            .catch(() => {
+                logout();
+                loadMetadata();
+                handleInitialRouting();
+            });
+    } else {
+        loadMetadata();
+        handleInitialRouting();
     }
 });

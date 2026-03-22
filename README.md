@@ -59,14 +59,18 @@ Des scripts à la racine permettent de maintenir la qualité du code :
 
 ## 🌐 Déploiement
 
-### Production
-Pour un déploiement en production, il est recommandé d'utiliser `uvicorn` derrière un reverse proxy (Nginx/Apache).
+### Configuration
+L'application se configure via des variables d'environnement (ou un fichier `.env`). 
+1. Copiez le fichier d'exemple : `cp .env.example .env`
+2. Ajustez la `SECRET_KEY` et la `DATABASE_URL` dans le fichier `.env`.
 
-1. **Variables d'environnement** : Changez la `SECRET_KEY` dans `backend/src/auth.py` (ou utilisez un fichier `.env`).
-2. **Exécution** :
+### Production
+Pour un guide détaillé sur le déploiement (PostgreSQL, Gunicorn, Nginx), consultez le [**Guide de Mise en Production**](docs/production.md).
+
+Exécution rapide en production :
 ```bash
-cd backend/src
-uv run uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
+cd backend
+uv run gunicorn src.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
 ```
 
 ### Dossiers importants

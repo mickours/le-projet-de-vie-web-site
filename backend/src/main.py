@@ -5,22 +5,36 @@ from fastapi import FastAPI, Depends, HTTPException, status, Form, File, UploadF
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from database import engine, get_db
+from config import settings
 import models
 import schemas
 from auth import (
     get_password_hash,
     verify_password,
     create_access_token,
-    ACCESS_TOKEN_EXPIRE_MINUTES,
     get_current_user,
 )
 
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Mon Projet de Vie - L'Aventure de l'Orientation")
+app = FastAPI(
+    title="Mon Projet de Vie - L'Aventure de l'Orientation",
+    description="Plateforme éducative d'orientation avec un style Manga.",
+    version="1.0.0",
+)
+
+# CORS configuration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -33,7 +47,7 @@ app.mount("/uploads", StaticFiles(directory=uploads_path), name="uploads")
 # --- Authentication ---
 
 
-@app.post("/token", response_model=schemas.Token)
+@app.post("/token", response_model=schemas.Token, tags=["Auth"])
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
@@ -47,14 +61,14 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@app.post("/register", response_model=schemas.User)
+@app.post("/register", response_model=schemas.User, tags=["Auth"])
 async def register_user(user_in: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = (
         db.query(models.User).filter(models.User.username == user_in.username).first()
@@ -87,12 +101,12 @@ async def register_user(user_in: schemas.UserCreate, db: Session = Depends(get_d
     return new_user
 
 
-@app.get("/users/me", response_model=schemas.User)
+@app.get("/users/me", response_model=schemas.User, tags=["User"])
 async def read_users_me(current_user: models.User = Depends(get_current_user)):
     return current_user
 
 
-@app.put("/users/me", response_model=schemas.UserWithToken)
+@app.put("/users/me", response_model=schemas.UserWithToken, tags=["User"])
 async def update_users_me(
     user_in: schemas.UserUpdate,
     current_user: models.User = Depends(get_current_user),
@@ -111,7 +125,7 @@ async def update_users_me(
             raise HTTPException(status_code=400, detail="Username already taken")
         current_user.username = user_in.username
         # Generate new token
-        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         new_token = create_access_token(
             data={"sub": current_user.username}, expires_delta=access_token_expires
         )
@@ -152,22 +166,22 @@ async def update_users_me(
 # --- Metadata (Roles, Levels, Themes, Types) ---
 
 
-@app.get("/roles", response_model=list[schemas.Role])
+@app.get("/roles", response_model=list[schemas.Role], tags=["Metadata"])
 async def get_roles(db: Session = Depends(get_db)):
     return db.query(models.Role).all()
 
 
-@app.get("/levels", response_model=list[schemas.Level])
+@app.get("/levels", response_model=list[schemas.Level], tags=["Metadata"])
 async def get_levels(db: Session = Depends(get_db)):
     return db.query(models.Level).all()
 
 
-@app.get("/themes")
+@app.get("/themes", tags=["Metadata"])
 async def get_themes(db: Session = Depends(get_db)):
     return db.query(models.Theme).all()
 
 
-@app.get("/types")
+@app.get("/types", tags=["Metadata"])
 async def get_types(db: Session = Depends(get_db)):
     return db.query(models.Type).all()
 
@@ -187,7 +201,7 @@ async def get_current_admin(
 # --- Activities ---
 
 
-@app.get("/activities", response_model=list[schemas.Activity])
+@app.get("/activities", response_model=list[schemas.Activity], tags=["Activities"])
 async def list_activities(
     level_id: Optional[int] = None,
     theme_id: Optional[int] = None,
@@ -204,7 +218,7 @@ async def list_activities(
     return query.all()
 
 
-@app.post("/activities", response_model=schemas.Activity)
+@app.post("/activities", response_model=schemas.Activity, tags=["Activities"])
 async def create_activity(
     title: str = Form(...),
     description: Optional[str] = Form(None),
@@ -247,7 +261,9 @@ async def create_activity(
     return db_activity
 
 
-@app.get("/activities/{activity_id}", response_model=schemas.Activity)
+@app.get(
+    "/activities/{activity_id}", response_model=schemas.Activity, tags=["Activities"]
+)
 async def get_activity(activity_id: int, db: Session = Depends(get_db)):
     activity = (
         db.query(models.Activity).filter(models.Activity.id == activity_id).first()
@@ -257,7 +273,7 @@ async def get_activity(activity_id: int, db: Session = Depends(get_db)):
     return activity
 
 
-@app.delete("/activities/{activity_id}")
+@app.delete("/activities/{activity_id}", tags=["Activities"])
 async def delete_activity(
     activity_id: int,
     db: Session = Depends(get_db),
@@ -276,8 +292,8 @@ async def delete_activity(
 # --- User Activities (Dossier Personnel) ---
 
 
-@app.get("/dossier", response_model=list[schemas.UserActivity])
-async def get_dossier(
+@app.get("/dossier", response_model=list[schemas.UserActivity], tags=["Dossier"])
+async def get_dossier_data(
     current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)
 ):
     return (
@@ -287,7 +303,11 @@ async def get_dossier(
     )
 
 
-@app.post("/activities/{activity_id}/track", response_model=schemas.UserActivity)
+@app.post(
+    "/activities/{activity_id}/track",
+    response_model=schemas.UserActivity,
+    tags=["Dossier"],
+)
 async def track_activity(
     activity_id: int,
     track_in: schemas.UserActivityCreate,
@@ -331,7 +351,11 @@ async def track_activity(
 # --- Comments ---
 
 
-@app.get("/activities/{activity_id}/comments", response_model=list[schemas.Comment])
+@app.get(
+    "/activities/{activity_id}/comments",
+    response_model=list[schemas.Comment],
+    tags=["Comments"],
+)
 async def list_comments(activity_id: int, db: Session = Depends(get_db)):
     comments = (
         db.query(models.Comment)
@@ -350,7 +374,11 @@ async def list_comments(activity_id: int, db: Session = Depends(get_db)):
     return comments
 
 
-@app.post("/activities/{activity_id}/comments", response_model=schemas.Comment)
+@app.post(
+    "/activities/{activity_id}/comments",
+    response_model=schemas.Comment,
+    tags=["Comments"],
+)
 async def create_comment(
     activity_id: int,
     comment_in: schemas.CommentBase,
@@ -372,7 +400,9 @@ async def create_comment(
 # --- Moderation (Admin only) ---
 
 
-@app.get("/admin/comments/pending", response_model=list[schemas.Comment])
+@app.get(
+    "/admin/comments/pending", response_model=list[schemas.Comment], tags=["Admin"]
+)
 async def list_pending_comments(
     admin: models.User = Depends(get_current_admin), db: Session = Depends(get_db)
 ):
@@ -385,7 +415,7 @@ async def list_pending_comments(
     return comments
 
 
-@app.post("/admin/comments/{comment_id}/approve")
+@app.post("/admin/comments/{comment_id}/approve", tags=["Admin"])
 async def approve_comment(
     comment_id: int,
     admin: models.User = Depends(get_current_admin),
@@ -399,7 +429,7 @@ async def approve_comment(
     return {"status": "Comment approved"}
 
 
-@app.delete("/admin/comments/{comment_id}")
+@app.delete("/admin/comments/{comment_id}", tags=["Admin"])
 async def delete_comment(
     comment_id: int,
     admin: models.User = Depends(get_current_admin),

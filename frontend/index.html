@@ -11,7 +11,7 @@
         <div class="header-container">
             <h1><span class="icon">⚔️</span> L'Aventure</h1>
             
-            <div id="user-info" class="hidden">
+            <div id="user-info">
                 <button id="menu-toggle" aria-label="Ouvrir le menu">
                     <span></span>
                     <span></span>
@@ -39,11 +39,12 @@
                     </nav>
                     
                     <div id="user-controls">
-                        <div id="user-display">
+                        <div id="user-display" class="hidden">
                             <span id="avatar-display">👤</span>
                             <span id="username-display"></span>
                         </div>
-                        <button id="logout-btn" title="Déconnexion">
+                        <button id="login-nav-btn" class="nav-btn">Connexion</button>
+                        <button id="logout-btn" title="Déconnexion" class="hidden">
                             <svg class="nav-icon" viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>
                         </button>
                     </div>
@@ -133,7 +134,7 @@
                 <!-- Contenu injecté -->
             </div>
             <hr>
-            <div class="activity-actions">
+            <div class="activity-actions hidden" id="authenticated-actions">
                 <h3><span class="icon">🏆</span> Ma Progression</h3>
                 <div class="progression-grid">
                     <div class="form-group">
@@ -149,14 +150,24 @@
                 </div>
                 <button id="save-progress-btn">Enregistrer mon exploit</button>
             </div>
+
+            <div class="activity-actions" id="guest-actions">
+                <h3><span class="icon">🚀</span> Envie de rejoindre l'aventure ?</h3>
+                <p>Connecte-toi pour créer ton dossier personnalisé, enregistrer ta progression et partager tes impressions avec les autres aventuriers !</p>
+                <button class="mt-2 start-adventure-btn">Démarrer mon aventure</button>
+            </div>
+
             <hr>
             <div class="comments-section">
                 <h3><span class="icon">💬</span> Commentaires</h3>
                 <div id="comments-list"></div>
-                <form id="comment-form">
+                <form id="comment-form" class="hidden">
                     <textarea id="comment-input" placeholder="Partage ton avis..." required></textarea>
                     <button type="submit">Envoyer</button>
                 </form>
+                <div id="guest-comment-msg" class="mt-1">
+                    <p><em>Connecte-toi pour ajouter un commentaire.</em></p>
+                </div>
             </div>
         </section>
 
