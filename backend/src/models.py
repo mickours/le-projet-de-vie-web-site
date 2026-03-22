@@ -34,6 +34,7 @@ class Activity(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(200), nullable=False)
     description = Column(Text)
+    video_url = Column(String(500), nullable=True)
     type_id = Column(Integer, ForeignKey("types.id"))
     theme_id = Column(Integer, ForeignKey("themes.id"))
     level_id = Column(Integer, ForeignKey("levels.id"))
@@ -61,6 +62,8 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String(100), unique=True, nullable=False, index=True)
     password_hash = Column(String(255), nullable=False)
+    avatar = Column(String(50), default="👤")
+    age = Column(Integer, nullable=True)
     role_id = Column(Integer, ForeignKey("roles.id"))
     level_id = Column(Integer, ForeignKey("levels.id"))
 

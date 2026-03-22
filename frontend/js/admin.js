@@ -142,6 +142,11 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('theme_id', document.getElementById('act-theme').value);
         formData.append('type_id', document.getElementById('act-type').value);
         
+        const videoUrl = document.getElementById('act-video').value;
+        if (videoUrl) {
+            formData.append('video_url', videoUrl);
+        }
+        
         const fileInput = document.getElementById('act-file');
         for (let i = 0; i < fileInput.files.length; i++) {
             formData.append('files', fileInput.files[i]);

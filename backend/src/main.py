@@ -92,6 +92,63 @@ async def read_users_me(current_user: models.User = Depends(get_current_user)):
     return current_user
 
 
+@app.put("/users/me", response_model=schemas.UserWithToken)
+async def update_users_me(
+    user_in: schemas.UserUpdate,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    new_token = None
+
+    if user_in.username is not None and user_in.username != current_user.username:
+        # Check if username is taken
+        existing_user = (
+            db.query(models.User)
+            .filter(models.User.username == user_in.username)
+            .first()
+        )
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Username already taken")
+        current_user.username = user_in.username
+        # Generate new token
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        new_token = create_access_token(
+            data={"sub": current_user.username}, expires_delta=access_token_expires
+        )
+
+    if user_in.avatar is not None:
+        current_user.avatar = user_in.avatar
+
+    if user_in.age is not None:
+        current_user.age = user_in.age
+
+    if user_in.role_id is not None:
+        role = db.query(models.Role).filter(models.Role.id == user_in.role_id).first()
+        if not role:
+            raise HTTPException(status_code=400, detail="Role does not exist")
+        current_user.role_id = user_in.role_id
+
+    if user_in.level_id is not None:
+        level = (
+            db.query(models.Level).filter(models.Level.id == user_in.level_id).first()
+        )
+        if not level:
+            raise HTTPException(status_code=400, detail="Level does not exist")
+        current_user.level_id = user_in.level_id
+
+    if user_in.password is not None:
+        current_user.password_hash = get_password_hash(user_in.password)
+
+    db.commit()
+    db.refresh(current_user)
+
+    return {
+        "user": current_user,
+        "access_token": new_token,
+        "token_type": "bearer" if new_token else None,
+    }
+
+
 # --- Metadata (Roles, Levels, Themes, Types) ---
 
 
@@ -151,6 +208,7 @@ async def list_activities(
 async def create_activity(
     title: str = Form(...),
     description: Optional[str] = Form(None),
+    video_url: Optional[str] = Form(None),
     level_id: int = Form(...),
     theme_id: int = Form(...),
     type_id: int = Form(...),
@@ -161,6 +219,7 @@ async def create_activity(
     db_activity = models.Activity(
         title=title,
         description=description,
+        video_url=video_url,
         level_id=level_id,
         theme_id=theme_id,
         type_id=type_id,
@@ -170,6 +229,8 @@ async def create_activity(
     db.refresh(db_activity)
 
     for file in files:
+        if not file.filename:
+            continue
         file_location = os.path.join(uploads_path, file.filename)
         with open(file_location, "wb") as buffer:
             buffer.write(await file.read())
@@ -360,12 +421,16 @@ async def admin_page():
     return {"message": "Admin page not found"}
 
 
-@app.get("/adventure")
-async def adventure_page():
+@app.get("/{full_path:path}")
+async def serve_frontend(full_path: str):
+    # If the path looks like a file or an internal path, let static mount/404 handle it
+    if "." in full_path or full_path.startswith(("uploads", "frontend")):
+        raise HTTPException(status_code=404)
+
     index_path = os.path.join(frontend_path, "index.html")
     if os.path.exists(index_path):
         return FileResponse(index_path)
-    return {"message": "Adventure page not found"}
+    return {"message": "Frontend index not found"}
 
 
 @app.get("/")

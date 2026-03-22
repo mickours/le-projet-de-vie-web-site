@@ -43,13 +43,30 @@ class UserCreate(UserBase):
     level_id: Optional[int] = None
 
 
+class UserUpdate(BaseModel):
+    username: Optional[str] = None
+    avatar: Optional[str] = None
+    age: Optional[int] = None
+    role_id: Optional[int] = None
+    level_id: Optional[int] = None
+    password: Optional[str] = None
+
+
 class User(UserBase):
     model_config = ConfigDict(from_attributes=True)
     id: int
+    avatar: Optional[str] = "👤"
+    age: Optional[int] = None
     role_id: int
     level_id: Optional[int] = None
     role: Optional[Role] = None
     level: Optional[Level] = None
+
+
+class UserWithToken(BaseModel):
+    user: User
+    access_token: Optional[str] = None
+    token_type: Optional[str] = None
 
 
 # --- Document Schemas ---
@@ -68,6 +85,7 @@ class Document(DocumentBase):
 class ActivityBase(BaseModel):
     title: str
     description: Optional[str] = None
+    video_url: Optional[str] = None
     type_id: int
     theme_id: int
     level_id: int
