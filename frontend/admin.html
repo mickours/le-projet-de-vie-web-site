@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Projet de Vie - Administration</title>
+    <link rel="stylesheet" href="/frontend/css/style.css">
+</head>
+<body>
+    <header>
+        <h1><span class="icon">🛡️</span> Administration de l'Aventure</h1>
+        <div id="user-info" class="hidden">
+            <span id="username-display"></span>
+            <button id="logout-btn">Déconnexion</button>
+        </div>
+    </header>
+    
+    <main id="app">
+        <!-- Section Connexion Admin -->
+        <section id="login-section" class="panel">
+            <h2>Accès Réservé au Maître de l'Aventure</h2>
+            <form id="admin-login-form">
+                <div class="form-group">
+                    <label for="username">Nom d'administrateur</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Clé de sécurité</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit">Ouvrir le portail</button>
+            </form>
+        </section>
+
+        <!-- Section Admin Dashboard (Visible après connexion) -->
+        <section id="admin-section" class="panel hidden">
+            <h2>Tableau de Bord de l'Aventure</h2>
+            <div class="admin-tabs">
+                <button class="tab-btn active" data-tab="admin-activities">Gérer les Quêtes</button>
+                <button class="tab-btn" data-tab="admin-comments">Modération des Paroles</button>
+            </div>
+
+            <div id="admin-activities" class="tab-content">
+                <div class="admin-split">
+                    <div class="admin-form-col">
+                        <h3>Ajouter une nouvelle quête</h3>
+                        <form id="add-activity-form">
+                            <input type="text" id="act-title" placeholder="Titre de la quête" required>
+                            <textarea id="act-desc" placeholder="Description pour les aventuriers"></textarea>
+                            <select id="act-level" required></select>
+                            <select id="act-theme" required></select>
+                            <select id="act-type" required></select>
+                            <div class="form-group">
+                                <label for="act-file">Documents (PDF, Image...)</label>
+                                <input type="file" id="act-file" multiple>
+                            </div>
+                            <button type="submit">Sceller la quête</button>
+                        </form>
+                    </div>
+                    <div class="admin-list-col">
+                        <h3>Quêtes existantes</h3>
+                        <div id="admin-activities-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="admin-comments" class="tab-content hidden">
+                <h3>Commentaires à modérer</h3>
+                <div id="pending-comments-list"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Administration Mon Projet de Vie</p>
+    </footer>
+
+    <script src="/frontend/js/admin.js"></script>
+</body>
+</html>

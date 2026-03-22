@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Projet de Vie - L'Aventure de l'Orientation</title>
+    <link rel="stylesheet" href="/frontend/css/style.css">
+</head>
+<body>
+    <header>
+        <h1><span class="icon">⚔️</span> L'Aventure de l'Orientation</h1>
+        <div id="user-info" class="hidden">
+            <nav id="main-nav">
+                <button class="nav-btn" data-view="home">
+                    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                    Accueil
+                </button>
+                <button class="nav-btn" data-view="activities">
+                    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M14.5 18l-4.5-4.5-4.5 4.5-1.5-1.5 6-6 6 6-1.5 1.5zM14.5 12l-4.5-4.5-4.5 4.5-1.5-1.5 6-6 6 6-1.5 1.5z"/></svg>
+                    Quêtes
+                </button>
+                <button class="nav-btn" data-view="dossier">
+                    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                    Mon Dossier
+                </button>
+            </nav>
+            <span id="username-display"></span>
+            <button id="logout-btn">Déconnexion</button>
+        </div>
+    </header>
+    
+    <main id="app">
+        <!-- Section Connexion / Inscription -->
+        <section id="login-section" class="panel">
+            <div id="login-box">
+                <h2><span class="icon">🗝️</span> Prêt pour l'aventure ?</h2>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="username">Nom d'aventurier</label>
+                        <input type="text" id="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Mot de passe</label>
+                        <input type="password" id="password" required>
+                    </div>
+                    <button type="submit">Se connecter</button>
+                </form>
+                <p class="hint">Nouveau ici ? <a href="#" id="show-register">Crée ton profil d'aventurier</a></p>
+            </div>
+
+            <div id="register-box" class="hidden">
+                <h2><span class="icon">✨</span> Nouvel Aventurier</h2>
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="reg-username">Nom d'aventurier</label>
+                        <input type="text" id="reg-username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-password">Mot de passe</label>
+                        <input type="password" id="reg-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-role">Ton rôle</label>
+                        <select id="reg-role" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-level">Ton niveau</label>
+                        <select id="reg-level" required></select>
+                    </div>
+                    <button type="submit">Rejoindre l'aventure</button>
+                </form>
+                <p class="hint">Déjà inscrit ? <a href="#" id="show-login">Retour à la connexion</a></p>
+            </div>
+        </section>
+
+        <!-- Section Accueil / Dashboard -->
+        <section id="home-section" class="panel view hidden">
+            <h2><span class="icon">🗺️</span> Ton Tableau de Bord</h2>
+            <p style="margin-bottom: 2rem;">Choisis ton parcours pour explorer les métiers et les formations selon ton profil.</p>
+            
+            <div class="dashboard-grid">
+                <div class="dashboard-group">
+                    <h3><span class="icon">👥</span> Explore par Rôle</h3>
+                    <div id="role-buttons" class="button-cloud"></div>
+                </div>
+                <div class="dashboard-group">
+                    <h3><span class="icon">🎓</span> Explore par Niveau</h3>
+                    <div id="level-buttons" class="button-cloud"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Activités (Liste) -->
+        <section id="activities-section" class="panel view hidden">
+            <div class="header-actions">
+                <h2><span class="icon">🏹</span> Tes quêtes disponibles</h2>
+                <div class="filters">
+                    <select id="level-filter">
+                        <option value="">Tous les niveaux</option>
+                    </select>
+                </div>
+            </div>
+            <div id="activities-list" class="manga-grid"></div>
+        </section>
+
+        <!-- Section Détail Activité -->
+        <section id="activity-detail-section" class="panel view hidden">
+            <button class="back-btn">&larr; Retour aux quêtes</button>
+            <div id="activity-content">
+                <!-- Contenu injecté -->
+            </div>
+            <hr>
+            <div class="activity-actions">
+                <h3><span class="icon">🏆</span> Ma Progression</h3>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="quest-completed"> Marquer comme terminée
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label for="quest-notes">Mes notes personnelles</label>
+                    <textarea id="quest-notes" rows="3"></textarea>
+                </div>
+                <button id="save-progress-btn">Enregistrer ma progression</button>
+            </div>
+            <hr>
+            <div class="comments-section">
+                <h3><span class="icon">💬</span> Commentaires</h3>
+                <div id="comments-list"></div>
+                <form id="comment-form">
+                    <textarea id="comment-input" placeholder="Partage ton avis..." required></textarea>
+                    <button type="submit">Envoyer</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Section Mon Dossier -->
+        <section id="dossier-section" class="panel view hidden">
+            <div class="header-actions">
+                <h2><span class="icon">📜</span> Mon Dossier Personnel</h2>
+                <button id="print-btn">Imprimer mon dossier</button>
+            </div>
+            <div id="dossier-content">
+                <!-- Liste des activités terminées -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Mon Projet de Vie - <span id="current-role">Visiteur</span></p>
+    </footer>
+
+    <script src="/frontend/js/main.js"></script>
+</body>
+</html>
