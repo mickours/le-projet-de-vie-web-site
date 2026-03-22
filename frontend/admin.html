@@ -3,42 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Projet de Vie - Administration</title>
+    <title>Administration - L'aventure de l'Orientation</title>
     <link rel="stylesheet" href="/frontend/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
         <div class="header-container">
-            <h1><span class="icon">🛡️</span> Administration</h1>
-            <nav>
-                <a href="/" class="nav-btn">
-                    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-                    Retour au site
-                </a>
-            </nav>
-            <div id="user-info" class="hidden">
-                <span id="username-display"></span>
-                <button id="logout-btn" title="Déconnexion">
-                    <svg class="nav-icon" viewBox="0 0 24 24" style="fill: white;"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>
+            <h1><span class="icon">🛡️</span> L'aventure de l'Orientation (Admin)</h1>
+            
+            <div id="user-info">
+                <button id="menu-toggle" aria-label="Ouvrir le menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </button>
+
+                <div id="nav-wrapper">
+                    <nav id="main-nav">
+                        <a href="/" class="nav-btn">
+                            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                            <span>Retour au site</span>
+                        </a>
+                    </nav>
+                    
+                    <div id="user-controls" class="hidden">
+                        <div id="user-display">
+                            <span id="username-display"></span>
+                        </div>
+                        <button id="logout-btn" title="Déconnexion">
+                            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24" style="fill: white;"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
     
     <main id="app">
         <!-- Section Connexion Admin -->
-        <section id="login-section" class="panel">
-            <h2>Accès Réservé au Maître de l'Aventure</h2>
+        <section id="login-section" class="panel" style="max-width: 500px; margin: 5rem auto;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <span class="icon" style="width: 80px; height: 80px; font-size: 2.5rem;">🛡️</span>
+                <h2 style="border: none; margin-top: 1.5rem;">Maître de l'Aventure</h2>
+                <p>Déclinez votre identité pour accéder au grimoire.</p>
+            </div>
             <form id="admin-login-form">
                 <div class="form-group">
                     <label for="username">Nom d'administrateur</label>
-                    <input type="text" id="username" required>
+                    <input type="text" id="username" placeholder="Ex: Merlin" required>
                 </div>
                 <div class="form-group">
                     <label for="password">Clé de sécurité</label>
-                    <input type="password" id="password" required>
+                    <input type="password" id="password" placeholder="••••••••" required>
                 </div>
-                <button type="submit">Ouvrir le portail</button>
+                <button type="submit" style="width: 100%; margin-top: 1rem;">Ouvrir le portail</button>
             </form>
         </section>
 
@@ -55,20 +74,46 @@
                     <div class="admin-form-col">
                         <h3>Ajouter une nouvelle quête</h3>
                         <form id="add-activity-form">
-                            <input type="text" id="act-title" placeholder="Titre de la quête" required>
-                            <textarea id="act-desc" placeholder="Description pour les aventuriers"></textarea>
-                            <select id="act-level" required></select>
-                            <select id="act-theme" required></select>
-                            <select id="act-type" required></select>
                             <div class="form-group">
-                                <label for="act-video">Lien de la Vidéo (YouTube, etc.)</label>
-                                <input type="url" id="act-video" placeholder="https://...">
+                                <label for="act-title">Titre de la quête</label>
+                                <input type="text" id="act-title" placeholder="Ex: Découvrir les métiers du web" required>
                             </div>
+                            
                             <div class="form-group">
-                                <label for="act-file">Documents (PDF, Image...)</label>
+                                <label for="act-desc">Description</label>
+                                <textarea id="act-desc" placeholder="Expliquez l'objectif de cette quête aux aventuriers..." rows="4"></textarea>
+                            </div>
+
+                            <div class="form-grid-profile">
+                                <div class="form-group">
+                                    <label for="act-level">Niveau scolaire</label>
+                                    <select id="act-level" required></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="act-role">Rôle concerné</label>
+                                    <select id="act-role" required></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="act-theme">Thématique</label>
+                                    <select id="act-theme" required></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="act-type">Type d'activité</label>
+                                    <select id="act-type" required></select>
+                                </div>
+                            </div>
+
+                            <div class="form-group mt-1">
+                                <label for="act-video">Lien de la Vidéo (YouTube, Vimeo...)</label>
+                                <input type="url" id="act-video" placeholder="https://www.youtube.com/watch?v=...">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="act-file">Documents à télécharger (PDF, Image...)</label>
                                 <input type="file" id="act-file" multiple>
                             </div>
-                            <button type="submit">Sceller la quête</button>
+
+                            <button type="submit" style="width: 100%; margin-top: 1rem;">Sceller la quête</button>
                         </form>
                     </div>
                     <div class="admin-list-col">
@@ -86,7 +131,7 @@
     </main>
 
     <footer>
-        <p>&copy; 2026 Administration Mon Projet de Vie</p>
+        <p>&copy; 2026 Administration - L'aventure de l'Orientation</p>
     </footer>
 
     <script src="/frontend/js/admin.js"></script>

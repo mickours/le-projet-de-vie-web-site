@@ -38,10 +38,12 @@ class Activity(Base):
     type_id = Column(Integer, ForeignKey("types.id"))
     theme_id = Column(Integer, ForeignKey("themes.id"))
     level_id = Column(Integer, ForeignKey("levels.id"))
+    role_id = Column(Integer, ForeignKey("roles.id"), nullable=True)
 
     type = relationship("Type")
     theme = relationship("Theme")
     level = relationship("Level")
+    role = relationship("Role")
     documents = relationship(
         "Document", back_populates="activity", cascade="all, delete-orphan"
     )

@@ -32,6 +32,24 @@ class Level(LevelBase):
     id: int
 
 
+class ThemeBase(BaseModel):
+    label: str
+
+
+class Theme(ThemeBase):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+
+
+class TypeBase(BaseModel):
+    label: str
+
+
+class Type(TypeBase):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+
+
 # --- User Schemas ---
 class UserBase(BaseModel):
     username: str
@@ -89,11 +107,16 @@ class ActivityBase(BaseModel):
     type_id: int
     theme_id: int
     level_id: int
+    role_id: Optional[int] = None
 
 
 class Activity(ActivityBase):
     model_config = ConfigDict(from_attributes=True)
     id: int
+    type: Optional[Type] = None
+    theme: Optional[Theme] = None
+    level: Optional[Level] = None
+    role: Optional[Role] = None
     documents: List[Document] = []
 
 

@@ -1,4 +1,4 @@
-# Mon Projet de Vie - L'Aventure de l'Orientation
+# L'aventure de l'Orientation
 
 Plateforme éducative d'orientation avec un style Manga, permettant aux élèves de découvrir des métiers et formations à travers des "quêtes" et de construire leur dossier personnel.
 

@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Projet de Vie - L'Aventure de l'Orientation</title>
+    <title>L'aventure de l'Orientation</title>
     <link rel="stylesheet" href="/frontend/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
         <div class="header-container">
-            <h1><span class="icon">⚔️</span> L'Aventure</h1>
+            <h1><span class="icon">⚔️</span> L'aventure de l'Orientation</h1>
             
             <div id="user-info">
                 <button id="menu-toggle" aria-label="Ouvrir le menu">
@@ -21,19 +22,19 @@
                 <div id="nav-wrapper">
                     <nav id="main-nav">
                         <button class="nav-btn" data-view="home">
-                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
                             <span>Accueil</span>
                         </button>
                         <button class="nav-btn" data-view="activities">
-                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M14.5 18l-4.5-4.5-4.5 4.5-1.5-1.5 6-6 6 6-1.5 1.5zM14.5 12l-4.5-4.5-4.5 4.5-1.5-1.5 6-6 6 6-1.5 1.5z"/></svg>
+                            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M14.5 18l-4.5-4.5-4.5 4.5-1.5-1.5 6-6 6 6-1.5 1.5zM14.5 12l-4.5-4.5-4.5 4.5-1.5-1.5 6-6 6 6-1.5 1.5z"/></svg>
                             <span>Quêtes</span>
                         </button>
                         <button class="nav-btn" data-view="dossier">
-                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
                             <span>Dossier</span>
                         </button>
                         <button class="nav-btn" data-view="profile">
-                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                             <span>Profil</span>
                         </button>
                     </nav>
@@ -45,7 +46,7 @@
                         </div>
                         <button id="login-nav-btn" class="nav-btn">Connexion</button>
                         <button id="logout-btn" title="Déconnexion" class="hidden">
-                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>
+                            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>
                         </button>
                     </div>
                 </div>
@@ -133,7 +134,7 @@
             <div id="activity-content">
                 <!-- Contenu injecté -->
             </div>
-            <hr>
+
             <div class="activity-actions hidden" id="authenticated-actions">
                 <h3><span class="icon">🏆</span> Ma Progression</h3>
                 <div class="progression-grid">
@@ -157,7 +158,6 @@
                 <button class="mt-2 start-adventure-btn">Démarrer mon aventure</button>
             </div>
 
-            <hr>
             <div class="comments-section">
                 <h3><span class="icon">💬</span> Commentaires</h3>
                 <div id="comments-list"></div>
@@ -253,6 +253,26 @@
                         <span class="avatar-icon">🧛</span>
                         <span class="avatar-name">Vampire</span>
                     </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar" value="🧚">
+                        <span class="avatar-icon">🧚</span>
+                        <span class="avatar-name">Fée</span>
+                    </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar" value="🧜">
+                        <span class="avatar-icon">🧜</span>
+                        <span class="avatar-name">Sirène</span>
+                    </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar" value="🐉">
+                        <span class="avatar-icon">🐉</span>
+                        <span class="avatar-name">Dragon</span>
+                    </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar" value="👺">
+                        <span class="avatar-icon">👺</span>
+                        <span class="avatar-name">Oni</span>
+                    </label>
                 </div>
                 <button type="submit">Enregistrer les changements</button>
             </form>
@@ -260,7 +280,7 @@
     </main>
 
     <footer>
-        <p>&copy; 2026 Mon Projet de Vie - <span id="current-role">Visiteur</span></p>
+        <p>&copy; 2026 L'aventure de l'Orientation - <span id="current-role">Visiteur</span></p>
     </footer>
 
     <script src="/frontend/js/main.js"></script>

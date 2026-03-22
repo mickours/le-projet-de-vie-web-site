@@ -4,8 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginSection = document.getElementById('login-section');
     const adminSection = document.getElementById('admin-section');
     const userInfo = document.getElementById('user-info');
+    const userControls = document.getElementById('user-controls');
     const usernameDisplay = document.getElementById('username-display');
     const logoutBtn = document.getElementById('logout-btn');
+    const menuToggle = document.getElementById('menu-toggle');
+    const navWrapper = document.getElementById('nav-wrapper');
 
     // Admin Tabs
     const tabButtons = document.querySelectorAll('.tab-btn');
@@ -36,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const logout = () => {
         localStorage.removeItem('token_admin');
         token = null;
-        userInfo.classList.add('hidden');
+        userControls.classList.add('hidden');
         adminSection.classList.add('hidden');
         loginSection.classList.remove('hidden');
     };
@@ -49,17 +52,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         loginSection.classList.add('hidden');
         adminSection.classList.remove('hidden');
-        userInfo.classList.remove('hidden');
+        userControls.classList.remove('hidden');
         usernameDisplay.textContent = user.username + " (Maître)";
         loadMetadata();
         loadAdminData();
     };
+
+    // --- Menu Toggle ---
+    if (menuToggle && navWrapper) {
+        menuToggle.addEventListener('click', () => {
+            navWrapper.classList.toggle('show');
+        });
+    }
 
     // --- Data Loading ---
     const loadMetadata = async () => {
         const levels = await (await apiFetch('/levels')).json();
         const actLevel = document.getElementById('act-level');
         actLevel.innerHTML = levels.map(l => `<option value="${l.id}">${l.label}</option>`).join('');
+
+        const roles = await (await apiFetch('/roles')).json();
+        const actRole = document.getElementById('act-role');
+        actRole.innerHTML = roles.filter(r => r.label !== 'admin').map(r => `<option value="${r.id}">${r.label}</option>`).join('');
 
         const themes = await (await apiFetch('/themes')).json();
         const actTheme = document.getElementById('act-theme');
@@ -75,19 +89,33 @@ document.addEventListener('DOMContentLoaded', () => {
         const activities = await (await apiFetch('/activities')).json();
         adminActivitiesList.innerHTML = activities.map(a => `
             <div class="admin-list-item">
-                <span>${a.title}</span>
-                <button onclick="deleteActivity(${a.id})" style="background:red">Supprimer</button>
+                <div class="admin-list-item-info">
+                    <strong>${a.title}</strong>
+                    <div class="meta-badges">
+                        ${a.level ? `<span>${a.level.label}</span>` : ''}
+                        ${a.role ? `<span>${a.role.label}</span>` : ''}
+                        ${a.theme ? `<span>${a.theme.label}</span>` : ''}
+                        ${a.type ? `<span>${a.type.label}</span>` : ''}
+                    </div>
+                </div>
+                <button class="delete-btn" onclick="deleteActivity(${a.id})">Supprimer</button>
             </div>
         `).join('') || '<p>Aucune quête dans le grimoire.</p>';
 
         // Load Pending Comments
         const pending = await (await apiFetch('/admin/comments/pending')).json();
         pendingCommentsList.innerHTML = pending.map(c => `
-            <div class="comment-item">
-                <p><strong>${c.username}</strong> sur quête ${c.activity_id}</p>
-                <p>${c.content}</p>
-                <button onclick="approveComment(${c.id})">Approuver</button>
-                <button onclick="deleteComment(${c.id})" style="background:red">Supprimer</button>
+            <div class="moderation-card">
+                <div class="moderation-meta">
+                    <strong>${c.username}</strong> sur la quête #${c.activity_id}
+                </div>
+                <div class="moderation-content">
+                    "${c.content}"
+                </div>
+                <div class="moderation-actions">
+                    <button class="approve-btn" onclick="approveComment(${c.id})">Approuver</button>
+                    <button class="reject-btn" onclick="deleteComment(${c.id})">Refuser</button>
+                </div>
             </div>
         `).join('') || '<p>Pas de paroles en attente.</p>';
     };
@@ -139,6 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('title', document.getElementById('act-title').value);
         formData.append('description', document.getElementById('act-desc').value);
         formData.append('level_id', document.getElementById('act-level').value);
+        formData.append('role_id', document.getElementById('act-role').value);
         formData.append('theme_id', document.getElementById('act-theme').value);
         formData.append('type_id', document.getElementById('act-type').value);
         

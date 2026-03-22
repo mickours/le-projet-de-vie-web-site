@@ -22,7 +22,7 @@ from auth import (
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="Mon Projet de Vie - L'Aventure de l'Orientation",
+    title="L'aventure de l'Orientation",
     description="Plateforme éducative d'orientation avec un style Manga.",
     version="1.0.0",
 )
@@ -38,8 +38,11 @@ app.add_middleware(
 
 # Paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-frontend_path = os.path.join(BASE_DIR, "frontend")
-uploads_path = os.path.join(BASE_DIR, "backend", "uploads")
+frontend_path = settings.FRONTEND_PATH or os.path.join(BASE_DIR, "frontend")
+uploads_path = settings.UPLOADS_PATH or os.path.join(BASE_DIR, "backend", "uploads")
+
+if not os.path.exists(uploads_path):
+    os.makedirs(uploads_path, exist_ok=True)
 
 app.mount("/frontend", StaticFiles(directory=frontend_path), name="frontend")
 app.mount("/uploads", StaticFiles(directory=uploads_path), name="uploads")
@@ -206,6 +209,7 @@ async def list_activities(
     level_id: Optional[int] = None,
     theme_id: Optional[int] = None,
     type_id: Optional[int] = None,
+    role_id: Optional[int] = None,
     db: Session = Depends(get_db),
 ):
     query = db.query(models.Activity)
@@ -215,6 +219,8 @@ async def list_activities(
         query = query.filter(models.Activity.theme_id == theme_id)
     if type_id:
         query = query.filter(models.Activity.type_id == type_id)
+    if role_id:
+        query = query.filter(models.Activity.role_id == role_id)
     return query.all()
 
 
@@ -226,6 +232,7 @@ async def create_activity(
     level_id: int = Form(...),
     theme_id: int = Form(...),
     type_id: int = Form(...),
+    role_id: Optional[int] = Form(None),
     files: List[UploadFile] = File([]),
     db: Session = Depends(get_db),
     admin: models.User = Depends(get_current_admin),
@@ -237,6 +244,7 @@ async def create_activity(
         level_id=level_id,
         theme_id=theme_id,
         type_id=type_id,
+        role_id=role_id,
     )
     db.add(db_activity)
     db.commit()

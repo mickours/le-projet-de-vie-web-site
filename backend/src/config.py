@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Get the base directory for default SQLite path
@@ -10,6 +10,10 @@ DEFAULT_DB_PATH = os.path.join(BASE_DIR, "monprojetdevie.db")
 class Settings(BaseSettings):
     # Database Settings
     DATABASE_URL: str = f"sqlite:///{DEFAULT_DB_PATH}"
+
+    # Paths
+    FRONTEND_PATH: Optional[str] = None
+    UPLOADS_PATH: Optional[str] = None
 
     # Authentication Settings
     SECRET_KEY: str = "aventure-orientation-super-secret-key"

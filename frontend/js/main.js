@@ -51,6 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let token = localStorage.getItem('token');
     let currentActivityId = null;
     let currentUser = null;
+    let currentLevelFilter = '';
+    let currentRoleFilter = '';
 
     // --- Helpers ---
     const apiFetch = async (url, options = {}) => {
@@ -163,16 +165,16 @@ document.addEventListener('DOMContentLoaded', () => {
         levelFilter.innerHTML = '<option value="">Tous les niveaux</option>';
         
         const regLevel = document.getElementById('reg-level');
-        regLevel.innerHTML = '';
+        if (regLevel) regLevel.innerHTML = '';
         levels.forEach(l => {
             const opt = `<option value="${l.id}">${l.label}</option>`;
             levelFilter.innerHTML += opt;
-            regLevel.innerHTML += opt;
+            if (regLevel) regLevel.innerHTML += opt;
         });
 
         const roles = await (await apiFetch('/roles')).json();
         const regRole = document.getElementById('reg-role');
-        regRole.innerHTML = roles.filter(r => r.label !== 'admin').map(r => `<option value="${r.id}">${r.label}</option>`).join('');
+        if (regRole) regRole.innerHTML = roles.filter(r => r.label !== 'admin').map(r => `<option value="${r.id}">${r.label}</option>`).join('');
     };
 
     const loadHome = async () => {
@@ -216,6 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.level-filter-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 levelFilter.value = btn.dataset.id;
+                loadActivities(btn.dataset.id, '');
                 switchView('activities');
             });
         });
@@ -223,22 +226,69 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.role-filter-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 levelFilter.value = '';
+                loadActivities('', btn.dataset.id);
                 switchView('activities');
             });
         });
     };
 
-    const loadActivities = async (levelId = '') => {
-        const url = levelId ? `/activities?level_id=${levelId}` : '/activities';
+    const loadActivities = async (levelId = '', roleId = '') => {
+        currentLevelFilter = levelId;
+        currentRoleFilter = roleId;
+        
+        let url = '/activities?';
+        if (levelId) url += `level_id=${levelId}&`;
+        if (roleId) url += `role_id=${roleId}&`;
+        
         const activities = await (await apiFetch(url)).json();
-        activitiesList.innerHTML = activities.map(a => `
-            <div class="activity-card">
-                <h3>${a.title}</h3>
-                <p>${a.description || ''}</p>
-                ${a.documents && a.documents.length > 0 ? `<p>📄 ${a.documents.length} document(s)</p>` : ''}
-                <button class="open-activity" data-id="${a.id}" style="margin-top:auto">Ouvrir</button>
+        
+        if (activities.length === 0) {
+            activitiesList.innerHTML = '<p>Aucune quête disponible pour le moment.</p>';
+            return;
+        }
+
+        // Group by theme
+        const grouped = {};
+        activities.forEach(a => {
+            const themeLabel = a.theme ? a.theme.label : 'Autres Quêtes';
+            if (!grouped[themeLabel]) grouped[themeLabel] = [];
+            grouped[themeLabel].push(a);
+        });
+
+        activitiesList.innerHTML = Object.entries(grouped).map(([theme, items]) => `
+            <div class="theme-section">
+                <div class="theme-header">
+                    <h3><span class="icon">📜</span> ${theme}</h3>
+                    <span class="theme-toggle-icon">▼</span>
+                </div>
+                <div class="manga-grid">
+                    ${items.map(a => `
+                        <div class="activity-card">
+                            <div class="activity-card-header">
+                                <div class="activity-badges">
+                                    ${a.type ? `<span class="badge badge-type">${a.type.label}</span>` : ''}
+                                    ${a.role ? `<span class="badge badge-role">${a.role.label}</span>` : ''}
+                                    ${a.level ? `<span class="badge badge-level">${a.level.label}</span>` : ''}
+                                </div>
+                                <h3>${a.title}</h3>
+                            </div>
+                            <div class="activity-card-body">
+                                <p>${a.description || ''}</p>
+                                ${a.documents && a.documents.length > 0 ? `<p class="mt-1"><strong>Documents :</strong> ${a.documents.length} fichier(s)</p>` : ''}
+                                <button class="open-activity" data-id="${a.id}">Ouvrir la quête</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
             </div>
         `).join('');
+
+        // Collapsible logic
+        document.querySelectorAll('.theme-header').forEach(header => {
+            header.addEventListener('click', () => {
+                header.parentElement.classList.toggle('collapsed');
+            });
+        });
 
         document.querySelectorAll('.open-activity').forEach(btn => {
             btn.addEventListener('click', () => showActivityDetail(btn.dataset.id));
@@ -264,7 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             videoHtml = `
                 <div class="video-container">
-                    <iframe src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    <iframe src="${embedUrl}" width="560" height="315" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 </div>
             `;
         }
@@ -272,12 +322,12 @@ document.addEventListener('DOMContentLoaded', () => {
         let docsHtml = '';
         if (activity.documents && activity.documents.length > 0) {
             docsHtml = `
-                <div class="documents-list mt-2">
-                    <h4>Documents pour l'aventure :</h4>
+                <div class="documents-section-box">
+                    <h4><span class="icon">📂</span> Documents pour l'aventure :</h4>
                     <div class="button-cloud" style="justify-content: flex-start; margin-top: 1rem;">
                         ${activity.documents.map(d => `
-                            <a href="${d.url}" target="_blank" class="cloud-btn" style="min-width: auto; flex-direction: row; padding: 0.6rem 1rem;">
-                                <span style="font-size: 1.2rem;">📄</span> ${d.filename}
+                            <a href="${d.url}" target="_blank" class="cloud-btn" style="min-width: auto; flex-direction: row; padding: 0.8rem 1.2rem;">
+                                <span style="font-size: 1.5rem;">📄</span> ${d.filename}
                             </a>
                         `).join('')}
                     </div>
@@ -286,10 +336,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         activityContent.innerHTML = `
-            <h2>${activity.title}</h2>
-            <div class="content-box">
-                <p class="mb-1">${activity.description || 'Bienvenue dans cette quête !'}</p>
-                ${videoHtml}
+            <div class="activity-detail-header">
+                <div class="activity-badges mb-1">
+                    ${activity.type ? `<span class="badge badge-type">${activity.type.label}</span>` : ''}
+                    ${activity.role ? `<span class="badge badge-role">${activity.role.label}</span>` : ''}
+                    ${activity.level ? `<span class="badge badge-level">${activity.level.label}</span>` : ''}
+                </div>
+                <h2>${activity.title}</h2>
+            </div>
+            
+            <div class="detail-body">
+                <div class="quest-description-box">
+                    <p>${activity.description || 'Bienvenue dans cette quête !'}</p>
+                </div>
+                
+                ${activity.video_url ? `<div class="video-section">${videoHtml}</div>` : ''}
                 ${docsHtml}
             </div>
         `;
@@ -352,18 +413,24 @@ document.addEventListener('DOMContentLoaded', () => {
         // Metadata should already be loaded, but let's ensure roles/levels selects are populated
         const levels = await (await apiFetch('/levels')).json();
         const profLevel = document.getElementById('prof-level');
-        profLevel.innerHTML = levels.map(l => `<option value="${l.id}">${l.label}</option>`).join('');
+        if (profLevel) profLevel.innerHTML = levels.map(l => `<option value="${l.id}">${l.label}</option>`).join('');
 
         const roles = await (await apiFetch('/roles')).json();
         const profRole = document.getElementById('prof-role');
-        profRole.innerHTML = roles.filter(r => r.label !== 'admin').map(r => `<option value="${r.id}">${r.label}</option>`).join('');
+        if (profRole) profRole.innerHTML = roles.filter(r => r.label !== 'admin').map(r => `<option value="${r.id}">${r.label}</option>`).join('');
 
         // Fill current values
-        document.getElementById('prof-username').value = currentUser.username;
-        document.getElementById('prof-age').value = currentUser.age || '';
-        document.getElementById('prof-role').value = currentUser.role_id;
-        document.getElementById('prof-level').value = currentUser.level_id || '';
-        document.getElementById('prof-password').value = '';
+        const profUsername = document.getElementById('prof-username');
+        if (profUsername) profUsername.value = currentUser.username;
+        
+        const profAge = document.getElementById('prof-age');
+        if (profAge) profAge.value = currentUser.age || '';
+        
+        if (profRole) profRole.value = currentUser.role_id;
+        if (profLevel) profLevel.value = currentUser.level_id || '';
+        
+        const profPassword = document.getElementById('prof-password');
+        if (profPassword) profPassword.value = '';
 
         if (currentUser.avatar) {
             const avatarRadio = document.querySelector(`input[name="avatar"][value="${currentUser.avatar}"]`);
@@ -374,104 +441,115 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- Events ---
-    profileForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const selectedAvatar = document.querySelector('input[name="avatar"]:checked').value;
-        const username = document.getElementById('prof-username').value;
-        const age = document.getElementById('prof-age').value;
-        const role_id = document.getElementById('prof-role').value;
-        const level_id = document.getElementById('prof-level').value;
-        const password = document.getElementById('prof-password').value;
+    if (profileForm) {
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const selectedAvatar = document.querySelector('input[name="avatar"]:checked').value;
+            const username = document.getElementById('prof-username').value;
+            const age = document.getElementById('prof-age').value;
+            const role_id = document.getElementById('prof-role').value;
+            const level_id = document.getElementById('prof-level').value;
+            const password = document.getElementById('prof-password').value;
 
-        const updateData = {
-            avatar: selectedAvatar,
-            username: username,
-            role_id: parseInt(role_id),
-            level_id: level_id ? parseInt(level_id) : null,
-            age: age ? parseInt(age) : null
-        };
+            const updateData = {
+                avatar: selectedAvatar,
+                username: username,
+                role_id: parseInt(role_id),
+                level_id: level_id ? parseInt(level_id) : null,
+                age: age ? parseInt(age) : null
+            };
 
-        if (password) {
-            updateData.password = password;
-        }
-        
-        try {
-            const res = await apiFetch('/users/me', {
-                method: 'PUT',
-                body: JSON.stringify(updateData)
-            });
-            const data = await res.json();
-            currentUser = data.user;
+            if (password) {
+                updateData.password = password;
+            }
             
-            // If token was refreshed
-            if (data.access_token) {
+            try {
+                const res = await apiFetch('/users/me', {
+                    method: 'PUT',
+                    body: JSON.stringify(updateData)
+                });
+                const data = await res.json();
+                currentUser = data.user;
+                
+                // If token was refreshed
+                if (data.access_token) {
+                    token = data.access_token;
+                    localStorage.setItem('token', token);
+                }
+
+                avatarDisplay.textContent = currentUser.avatar;
+                usernameDisplay.textContent = currentUser.username;
+                currentRole.textContent = currentUser.role ? currentUser.role.label : 'Utilisateur';
+                
+                alert('Profil mis à jour avec succès !');
+            } catch (error) {
+                alert('Erreur lors de la mise à jour : ' + error.message);
+            }
+        });
+    }
+
+    if (showRegister) {
+        showRegister.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginBox.classList.add('hidden');
+            registerBox.classList.remove('hidden');
+            loadMetadata();
+        });
+    }
+
+    if (showLogin) {
+        showLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerBox.classList.add('hidden');
+            loginBox.classList.remove('hidden');
+        });
+    }
+
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('username', e.target.username.value);
+            formData.append('password', e.target.password.value);
+            const res = await fetch('/token', { method: 'POST', body: formData });
+            if (res.ok) {
+                const data = await res.json();
                 token = data.access_token;
                 localStorage.setItem('token', token);
+                const user = await (await apiFetch('/users/me')).json();
+                showApp(user);
+            } else {
+                alert('Identifiants incorrects.');
             }
-
-            avatarDisplay.textContent = currentUser.avatar;
-            usernameDisplay.textContent = currentUser.username;
-            currentRole.textContent = currentUser.role ? currentUser.role.label : 'Utilisateur';
-            
-            alert('Profil mis à jour avec succès !');
-        } catch (error) {
-            alert('Erreur lors de la mise à jour : ' + error.message);
-        }
-    });
-    showRegister.addEventListener('click', (e) => {
-        e.preventDefault();
-        loginBox.classList.add('hidden');
-        registerBox.classList.remove('hidden');
-        loadMetadata();
-    });
-
-    showLogin.addEventListener('click', (e) => {
-        e.preventDefault();
-        registerBox.classList.add('hidden');
-        loginBox.classList.remove('hidden');
-    });
-
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData();
-        formData.append('username', e.target.username.value);
-        formData.append('password', e.target.password.value);
-        const res = await fetch('/token', { method: 'POST', body: formData });
-        if (res.ok) {
-            const data = await res.json();
-            token = data.access_token;
-            localStorage.setItem('token', token);
-            const user = await (await apiFetch('/users/me')).json();
-            showApp(user);
-        } else {
-            alert('Identifiants incorrects.');
-        }
-    });
-
-    registerForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const userData = {
-            username: e.target['reg-username'].value,
-            password: e.target['reg-password'].value,
-            role_id: parseInt(e.target['reg-role'].value),
-            level_id: parseInt(e.target['reg-level'].value)
-        };
-        const res = await fetch('/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(userData)
         });
-        if (res.ok) {
-            alert('Inscription réussie ! Connecte-toi maintenant.');
-            showLogin.click();
-        } else {
-            const err = await res.json();
-            alert('Erreur: ' + (err.detail || 'Inscription échouée'));
-        }
-    });
+    }
 
-    logoutBtn.addEventListener('click', logout);
-    loginNavBtn.addEventListener('click', () => switchView('login'));
+    if (registerForm) {
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userData = {
+                username: e.target['reg-username'].value,
+                password: e.target['reg-password'].value,
+                role_id: parseInt(e.target['reg-role'].value),
+                level_id: parseInt(e.target['reg-level'].value)
+            };
+            const res = await fetch('/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            });
+            if (res.ok) {
+                alert('Inscription réussie ! Connecte-toi maintenant.');
+                showLogin.click();
+            } else {
+                const err = await res.json();
+                alert('Erreur: ' + (err.detail || 'Inscription échouée'));
+            }
+        });
+    }
+
+    if (logoutBtn) logoutBtn.addEventListener('click', logout);
+    if (loginNavBtn) loginNavBtn.addEventListener('click', () => switchView('login'));
     
     document.querySelectorAll('.start-adventure-btn').forEach(btn => {
         btn.addEventListener('click', () => switchView('login'));
@@ -487,31 +565,35 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => switchView('activities'));
     });
 
-    levelFilter.addEventListener('change', (e) => loadActivities(e.target.value));
+    if (levelFilter) levelFilter.addEventListener('change', (e) => loadActivities(e.target.value));
 
-    saveProgressBtn.addEventListener('click', async () => {
-        await apiFetch(`/activities/${currentActivityId}/track`, {
-            method: 'POST',
-            body: JSON.stringify({
-                activity_id: parseInt(currentActivityId),
-                is_completed: questCompleted.checked,
-                notes: questNotes.value
-            })
+    if (saveProgressBtn) {
+        saveProgressBtn.addEventListener('click', async () => {
+            await apiFetch(`/activities/${currentActivityId}/track`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    activity_id: parseInt(currentActivityId),
+                    is_completed: questCompleted.checked,
+                    notes: questNotes.value
+                })
+            });
+            alert('Progression enregistrée !');
         });
-        alert('Progression enregistrée !');
-    });
+    }
 
-    commentForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        await apiFetch(`/activities/${currentActivityId}/comments`, {
-            method: 'POST',
-            body: JSON.stringify({ content: document.getElementById('comment-input').value })
+    if (commentForm) {
+        commentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await apiFetch(`/activities/${currentActivityId}/comments`, {
+                method: 'POST',
+                body: JSON.stringify({ content: document.getElementById('comment-input').value })
+            });
+            document.getElementById('comment-input').value = '';
+            alert('Commentaire envoyé ! Il sera visible après modération.');
         });
-        document.getElementById('comment-input').value = '';
-        alert('Commentaire envoyé ! Il sera visible après modération.');
-    });
+    }
 
-    printBtn.addEventListener('click', () => window.print());
+    if (printBtn) printBtn.addEventListener('click', () => window.print());
 
     if (token) {
         apiFetch('/users/me')
