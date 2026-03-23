@@ -1,8 +1,25 @@
-from sqlalchemy import Column, Integer, String, Text, Boolean, ForeignKey, DateTime
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Text,
+    Boolean,
+    ForeignKey,
+    DateTime,
+    Table,
+)
 from sqlalchemy.orm import relationship, declarative_base
 from datetime import datetime
 
 Base = declarative_base()
+
+
+user_relationships = Table(
+    "user_relationships",
+    Base.metadata,
+    Column("parent_id", Integer, ForeignKey("users.id"), primary_key=True),
+    Column("child_id", Integer, ForeignKey("users.id"), primary_key=True),
+)
 
 
 class Level(Base):
@@ -54,6 +71,7 @@ class Document(Base):
     id = Column(Integer, primary_key=True, index=True)
     filename = Column(String(255), nullable=False)
     url = Column(String(500), nullable=False)
+    doc_type = Column(String(20), default="pdf")  # 'pdf', 'video_file', 'video_link'
     activity_id = Column(Integer, ForeignKey("activities.id"))
 
     activity = relationship("Activity", back_populates="documents")
@@ -71,6 +89,14 @@ class User(Base):
 
     role = relationship("Role")
     level = relationship("Level")
+
+    children = relationship(
+        "User",
+        secondary=user_relationships,
+        primaryjoin=id == user_relationships.c.parent_id,
+        secondaryjoin=id == user_relationships.c.child_id,
+        backref="parents",
+    )
 
 
 class UserActivity(Base):

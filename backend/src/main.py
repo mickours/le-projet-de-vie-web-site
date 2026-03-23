@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from database import engine, get_db
 from config import settings
@@ -46,6 +46,12 @@ if not os.path.exists(uploads_path):
 
 app.mount("/frontend", StaticFiles(directory=frontend_path), name="frontend")
 app.mount("/uploads", StaticFiles(directory=uploads_path), name="uploads")
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    return FileResponse(os.path.join(frontend_path, "favicon.svg"))
+
 
 # --- Authentication ---
 
@@ -228,19 +234,27 @@ async def list_activities(
 async def create_activity(
     title: str = Form(...),
     description: Optional[str] = Form(None),
-    video_url: Optional[str] = Form(None),
     level_id: int = Form(...),
     theme_id: int = Form(...),
     type_id: int = Form(...),
     role_id: Optional[int] = Form(None),
+    video_links: List[str] = Form([]),
     files: List[UploadFile] = File([]),
     db: Session = Depends(get_db),
     admin: models.User = Depends(get_current_admin),
 ):
+    # Total resources limit check
+    total_resources = len([f for f in files if f.filename]) + len(
+        [v for v in video_links if v.strip()]
+    )
+    if total_resources > 10:
+        raise HTTPException(
+            status_code=400, detail="Maximum 10 resources allowed per quest"
+        )
+
     db_activity = models.Activity(
         title=title,
         description=description,
-        video_url=video_url,
         level_id=level_id,
         theme_id=theme_id,
         type_id=type_id,
@@ -250,6 +264,19 @@ async def create_activity(
     db.commit()
     db.refresh(db_activity)
 
+    # Process Video Links
+    for link in video_links:
+        if not link.strip():
+            continue
+        db_doc = models.Document(
+            filename="Vidéo (Lien)",
+            url=link.strip(),
+            doc_type="video_link",
+            activity_id=db_activity.id,
+        )
+        db.add(db_doc)
+
+    # Process Files
     for file in files:
         if not file.filename:
             continue
@@ -257,9 +284,16 @@ async def create_activity(
         with open(file_location, "wb") as buffer:
             buffer.write(await file.read())
 
+        # Determine doc_type based on extension
+        ext = os.path.splitext(file.filename)[1].lower()
+        doc_type = "pdf"
+        if ext in [".mp4", ".webm", ".ogg", ".mov", ".avi"]:
+            doc_type = "video_file"
+
         db_doc = models.Document(
             filename=file.filename,
             url=f"/uploads/{file.filename}",
+            doc_type=doc_type,
             activity_id=db_activity.id,
         )
         db.add(db_doc)
@@ -304,11 +338,53 @@ async def delete_activity(
 async def get_dossier_data(
     current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)
 ):
-    return (
+    # Get all activities for the user's level
+    level_activities = (
+        db.query(models.Activity)
+        .options(joinedload(models.Activity.theme))
+        .filter(models.Activity.level_id == current_user.level_id)
+        .all()
+    )
+
+    # Get all the user's existing tracking data (could be from any level)
+    user_tracks = (
         db.query(models.UserActivity)
+        .options(
+            joinedload(models.UserActivity.activity).joinedload(models.Activity.theme)
+        )
         .filter(models.UserActivity.user_id == current_user.id)
         .all()
     )
+
+    # Map tracked activities for easy check
+    tracks_map = {t.activity_id: t for t in user_tracks}
+    added_activity_ids = set()
+    result = []
+
+    # 1. Add all activities for the current level (pre-populate)
+    for activity in level_activities:
+        if activity.id in tracks_map:
+            result.append(tracks_map[activity.id])
+        else:
+            # Create a "virtual" record for activities not yet started in this level
+            result.append(
+                models.UserActivity(
+                    id=-activity.id,  # Virtual ID
+                    user_id=current_user.id,
+                    activity_id=activity.id,
+                    activity=activity,
+                    is_completed=False,
+                    notes="",
+                )
+            )
+        added_activity_ids.add(activity.id)
+
+    # 2. Add any other activities the user has interacted with (from previous levels)
+    for track in user_tracks:
+        if track.activity_id not in added_activity_ids:
+            result.append(track)
+
+    return result
 
 
 @app.post(
@@ -449,6 +525,83 @@ async def delete_comment(
     db.delete(comment)
     db.commit()
     return {"status": "Comment deleted"}
+
+
+# --- User Management (Admin only) ---
+
+
+@app.get("/admin/users", response_model=list[schemas.User], tags=["Admin"])
+async def list_users(
+    admin: models.User = Depends(get_current_admin), db: Session = Depends(get_db)
+):
+    return db.query(models.User).all()
+
+
+@app.delete("/admin/users/{user_id}", tags=["Admin"])
+async def delete_user(
+    user_id: int,
+    admin: models.User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.id == admin.id:
+        raise HTTPException(status_code=400, detail="Cannot delete yourself")
+    db.delete(user)
+    db.commit()
+    return {"status": "User deleted"}
+
+
+@app.put("/admin/users/{user_id}/reset-password", tags=["Admin"])
+async def reset_user_password(
+    user_id: int,
+    reset_in: schemas.PasswordReset,
+    admin: models.User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.password_hash = get_password_hash(reset_in.new_password)
+    db.commit()
+    return {"status": "Password reset successful"}
+
+
+@app.post("/admin/users/{parent_id}/children/{child_id}", tags=["Admin"])
+async def associate_child(
+    parent_id: int,
+    child_id: int,
+    admin: models.User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+):
+    parent = db.query(models.User).filter(models.User.id == parent_id).first()
+    child = db.query(models.User).filter(models.User.id == child_id).first()
+    if not parent or not child:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if child not in parent.children:
+        parent.children.append(child)
+        db.commit()
+    return {"status": "Child associated"}
+
+
+@app.delete("/admin/users/{parent_id}/children/{child_id}", tags=["Admin"])
+async def disassociate_child(
+    parent_id: int,
+    child_id: int,
+    admin: models.User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+):
+    parent = db.query(models.User).filter(models.User.id == parent_id).first()
+    child = db.query(models.User).filter(models.User.id == child_id).first()
+    if not parent or not child:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if child in parent.children:
+        parent.children.remove(child)
+        db.commit()
+    return {"status": "Child disassociated"}
 
 
 @app.get("/admin")

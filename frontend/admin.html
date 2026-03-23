@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administration - L'aventure de l'Orientation</title>
+    <link rel="icon" type="image/svg+xml" href="/frontend/favicon.svg">
     <link rel="stylesheet" href="/frontend/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
 </head>
@@ -51,11 +52,11 @@
             <form id="admin-login-form">
                 <div class="form-group">
                     <label for="username">Nom d'administrateur</label>
-                    <input type="text" id="username" placeholder="Ex: Merlin" required>
+                    <input type="text" id="username" placeholder="Ex: Merlin" autocomplete="username" required>
                 </div>
                 <div class="form-group">
                     <label for="password">Clé de sécurité</label>
-                    <input type="password" id="password" placeholder="••••••••" required>
+                    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" required>
                 </div>
                 <button type="submit" style="width: 100%; margin-top: 1rem;">Ouvrir le portail</button>
             </form>
@@ -66,6 +67,7 @@
             <h2>Tableau de Bord de l'Aventure</h2>
             <div class="admin-tabs">
                 <button class="tab-btn active" data-tab="admin-activities">Gérer les Quêtes</button>
+                <button class="tab-btn" data-tab="admin-users">Gérer les Aventuriers</button>
                 <button class="tab-btn" data-tab="admin-comments">Modération des Paroles</button>
             </div>
 
@@ -103,22 +105,73 @@
                                 </div>
                             </div>
 
-                            <div class="form-group mt-1">
-                                <label for="act-video">Lien de la Vidéo (YouTube, Vimeo...)</label>
-                                <input type="url" id="act-video" placeholder="https://www.youtube.com/watch?v=...">
+                            <div id="quest-resources-section" class="mt-2">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; background: var(--primary-light); padding: 1.2rem; border-radius: 12px; border: 3px solid var(--border-main); box-shadow: 4px 4px 0 var(--border-main);">
+                                    <h4 style="margin: 0; color: var(--text-header); font-size: 1.1rem;">Ressources (PDF ou Vidéo)</h4>
+                                    <button type="button" id="add-resource-btn" class="approve-btn" style="box-shadow: 3px 3px 0 var(--border-main);">+ Ajouter une ressource</button>
+                                </div>
+                                <div id="resources-list-inputs" class="admin-list-container">
+                                    <!-- Lignes de ressources ajoutées ici -->
+                                </div>
                             </div>
 
-                            <div class="form-group">
-                                <label for="act-file">Documents à télécharger (PDF, Image...)</label>
-                                <input type="file" id="act-file" multiple>
-                            </div>
-
-                            <button type="submit" style="width: 100%; margin-top: 1rem;">Sceller la quête</button>
+                            <button type="submit" style="width: 100%; margin-top: 2rem;">Sceller la quête</button>
                         </form>
                     </div>
                     <div class="admin-list-col">
                         <h3>Quêtes existantes</h3>
                         <div id="admin-activities-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="admin-users" class="tab-content hidden">
+                <div class="admin-split">
+                    <div class="admin-form-col">
+                        <h3>Inscrire un nouvel Aventurier</h3>
+                        <form id="admin-add-user-form">
+                            <div class="form-group">
+                                <label for="adm-username">Nom d'aventurier</label>
+                                <input type="text" id="adm-username" autocomplete="username" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="adm-password">Mot de passe initial</label>
+                                <input type="password" id="adm-password" autocomplete="new-password" required>
+                            </div>
+                            <div class="form-grid-profile">
+                                <div class="form-group">
+                                    <label for="adm-role">Rôle</label>
+                                    <select id="adm-role" required></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="adm-level">Niveau scolaire</label>
+                                    <select id="adm-level"></select>
+                                </div>
+                            </div>
+                            <button type="submit" style="width: 100%; margin-top: 1rem;">Inscrire l'aventurier</button>
+                        </form>
+                    </div>
+                    <div class="admin-list-col">
+                        <h3>Aventuriers enregistrés</h3>
+                        <div id="admin-users-list" class="admin-list-container"></div>
+                    </div>
+                </div>
+
+                <!-- Modal pour gérer les enfants -->
+                <div id="manage-children-modal" class="modal hidden">
+                    <div class="modal-overlay"></div>
+                    <div class="modal-content panel">
+                        <button class="close-modal">&times;</button>
+                        <h3>Gérer les enfants de <span id="parent-name-display"></span></h3>
+                        <div class="form-group mt-1">
+                            <label for="child-select">Associer un nouvel enfant (élève)</label>
+                            <div style="display: flex; gap: 1rem;">
+                                <select id="child-select" style="flex-grow: 1;"></select>
+                                <button id="add-child-btn">Associer</button>
+                            </div>
+                        </div>
+                        <h4>Enfants déjà associés :</h4>
+                        <div id="children-list" class="mt-1"></div>
                     </div>
                 </div>
             </div>

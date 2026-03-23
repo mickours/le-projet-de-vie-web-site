@@ -175,6 +175,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const roles = await (await apiFetch('/roles')).json();
         const regRole = document.getElementById('reg-role');
         if (regRole) regRole.innerHTML = roles.filter(r => r.label !== 'admin').map(r => `<option value="${r.id}">${r.label}</option>`).join('');
+
+        // Set default filter to user's level
+        if (currentUser && currentUser.level_id) {
+            levelFilter.value = currentUser.level_id;
+        }
     };
 
     const loadHome = async () => {
@@ -395,16 +400,147 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadDossier = async () => {
         const dossier = await (await apiFetch('/dossier')).json();
         if (dossier.length === 0) {
-            dossierContent.innerHTML = '<p>Ton dossier est vide pour le moment. Termine des quêtes !</p>';
+            dossierContent.innerHTML = '<p>Ton dossier est vide pour le moment. Aucune quête n\'est encore liée à ton niveau.</p>';
             return;
         }
-        dossierContent.innerHTML = dossier.map(t => `
-            <div class="panel">
-                <h3>${t.activity ? t.activity.title : 'Activité ' + t.activity_id}</h3>
-                <p>Statut: ${t.is_completed ? '✅ Terminé' : '⏳ En cours'}</p>
-                <p><strong>Mes notes:</strong> ${t.notes || 'Aucune note.'}</p>
+
+        // Group by Level then Theme
+        const hierarchy = {};
+        dossier.forEach(t => {
+            const levelLabel = (t.activity && t.activity.level) ? t.activity.level.label : 'Niveau Inconnu';
+            const themeLabel = (t.activity && t.activity.theme) ? t.activity.theme.label : 'Autres Quêtes';
+            
+            if (!hierarchy[levelLabel]) hierarchy[levelLabel] = {};
+            if (!hierarchy[levelLabel][themeLabel]) hierarchy[levelLabel][themeLabel] = [];
+            hierarchy[levelLabel][themeLabel].push(t);
+        });
+
+        // --- Screen View HTML ---
+        let screenHtml = `
+            <div class="no-print">
+                <p class="mb-2">Retrouve ici ton parcours d'aventurier classé par niveau et par thème.</p>
             </div>
-        `).join('');
+        `;
+
+        for (const [level, themes] of Object.entries(hierarchy)) {
+            screenHtml += `
+                <div class="level-group mb-3 no-print">
+                    <h2 class="level-title-main"><span class="icon">🎓</span> ${level}</h2>
+                    ${Object.entries(themes).map(([theme, items]) => `
+                        <div class="theme-section">
+                            <div class="theme-header">
+                                <h3><span class="icon">📜</span> ${theme}</h3>
+                                <span class="theme-toggle-icon">▼</span>
+                            </div>
+                            <div class="manga-grid">
+                                ${items.map(t => `
+                                    <div class="activity-card" style="background: ${t.is_completed ? '#f6ffed' : '#fff'}; border-color: ${t.is_completed ? '#52c41a' : 'black'}">
+                                        <div class="activity-card-header" style="background: ${t.is_completed ? '#d9f7be' : 'var(--primary-color)'}">
+                                            <h3>${t.activity ? t.activity.title : 'Activité ' + t.activity_id}</h3>
+                                        </div>
+                                        <div class="activity-card-body">
+                                            <p><strong>Statut:</strong> ${t.is_completed ? '✅ Terminé' : '⏳ En cours'}</p>
+                                            <p><strong>Mes notes:</strong> ${t.notes || '<em>Aucune note pour le moment.</em>'}</p>
+                                            <button class="open-activity mt-1" data-id="${t.activity_id}">Ouvrir la quête</button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // --- Print View HTML ---
+        const completedCount = dossier.filter(t => t.is_completed).length;
+        const totalCount = dossier.length;
+        const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
+        let printHtml = `
+            <div class="only-print printable-folder">
+                <!-- Cover Page -->
+                <div class="print-cover">
+                    <h1 class="print-main-title">MON DOSSIER D'ORIENTATION</h1>
+                    
+                    <div class="print-avatar-circle">
+                        ${currentUser ? currentUser.avatar : '👤'}
+                    </div>
+
+                    <div class="print-user-box">
+                        <h2 class="print-user-name">${currentUser ? currentUser.username : 'Aventurier'}</h2>
+                        
+                        <div style="display: flex; flex-direction: column; align-items: center; margin-top: 1rem;">
+                            <strong>PROGRESSION DANS L'AVENTURE</strong>
+                            <div class="print-progress-container">
+                                <div class="print-progress-bar" style="width: ${progressPercent}%"></div>
+                                <div class="print-progress-text">${completedCount} / ${totalCount} quêtes réussies</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="print-date">Document d'orientation officiel - Généré le ${new Date().toLocaleDateString()}</p>
+                </div>
+
+                <!-- Table of Contents -->
+                <div class="print-toc">
+                    <h2>Sommaire de l'Aventure</h2>
+                    <ul>
+                        ${Object.entries(hierarchy).map(([level, themes]) => `
+                            <li>
+                                <strong>Chapitre : ${level}</strong>
+                                <ul class="mt-1">
+                                    ${Object.keys(themes).map(theme => `<li>- ${theme}</li>`).join('')}
+                                </ul>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+
+                <!-- Content -->
+                <div class="print-content">
+                    ${Object.entries(hierarchy).map(([level, themes]) => `
+                        <div class="print-level-section">
+                            <h2 class="print-level-title">${level}</h2>
+                            ${Object.entries(themes).map(([theme, items]) => `
+                                <div class="print-theme-section">
+                                    <h3 class="print-theme-title">${theme}</h3>
+                                    ${items.map(t => `
+                                        <div class="print-quest-item">
+                                            <h4>${t.activity ? t.activity.title : 'Quête'}</h4>
+                                            <div class="print-quest-meta">
+                                                Statut : ${t.is_completed ? 'RÉUSSIE ✅' : 'EN COURS ⏳'}
+                                            </div>
+                                            <div class="print-quest-desc">
+                                                <strong>📜 OBJECTIF :</strong>
+                                                <p>${t.activity ? (t.activity.description || 'Découvrir ce domaine.') : ''}</p>
+                                            </div>
+                                            <div class="print-quest-notes">
+                                                <strong>🖋️ MES NOTES D'AVENTURIER :</strong>
+                                                <p>${t.notes || 'Aucune note consignée.'}</p>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            `).join('')}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        dossierContent.innerHTML = screenHtml + printHtml;
+
+        // Collapsible logic
+        document.querySelectorAll('.theme-header').forEach(header => {
+            header.addEventListener('click', () => {
+                header.parentElement.classList.toggle('collapsed');
+            });
+        });
+
+        document.querySelectorAll('.open-activity').forEach(btn => {
+            btn.addEventListener('click', () => showActivityDetail(btn.dataset.id));
+        });
     };
 
     const loadProfile = async () => {
@@ -480,10 +616,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 avatarDisplay.textContent = currentUser.avatar;
                 usernameDisplay.textContent = currentUser.username;
                 currentRole.textContent = currentUser.role ? currentUser.role.label : 'Utilisateur';
-                
+
                 alert('Profil mis à jour avec succès !');
-            } catch (error) {
-                alert('Erreur lors de la mise à jour : ' + error.message);
+                // Refresh metadata to update default level filter and synchronize views
+                loadMetadata();
+                } catch (error) {                alert('Erreur lors de la mise à jour : ' + error.message);
             }
         });
     }

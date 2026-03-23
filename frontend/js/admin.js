@@ -18,8 +18,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const addActivityForm = document.getElementById('add-activity-form');
     const adminActivitiesList = document.getElementById('admin-activities-list');
     const pendingCommentsList = document.getElementById('pending-comments-list');
+    const resourcesListInputs = document.getElementById('resources-list-inputs');
+    const addResourceBtn = document.getElementById('add-resource-btn');
+
+    // Users Management
+    const adminAddUserForm = document.getElementById('admin-add-user-form');
+    const adminUsersList = document.getElementById('admin-users-list');
+    const manageChildrenModal = document.getElementById('manage-children-modal');
+    const closeModalBtn = manageChildrenModal.querySelector('.close-modal');
+    const childSelect = document.getElementById('child-select');
+    const addChildBtn = document.getElementById('add-child-btn');
+    const childrenList = document.getElementById('children-list');
+    const parentNameDisplay = document.getElementById('parent-name-display');
 
     let token = localStorage.getItem('token_admin');
+    let currentParentId = null;
 
     // --- Helpers ---
     const apiFetch = async (url, options = {}) => {
@@ -44,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loginSection.classList.remove('hidden');
     };
 
-    const showAdminPanel = (user) => {
+    const showAdminPanel = async (user) => {
         if (user.role.label !== 'admin') {
             alert("Accès refusé. Ce portail est réservé aux administrateurs.");
             logout();
@@ -54,8 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
         adminSection.classList.remove('hidden');
         userControls.classList.remove('hidden');
         usernameDisplay.textContent = user.username + " (Maître)";
-        loadMetadata();
-        loadAdminData();
+        await loadMetadata();
+        await loadAdminData();
     };
 
     // --- Menu Toggle ---
@@ -67,21 +80,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Data Loading ---
     const loadMetadata = async () => {
-        const levels = await (await apiFetch('/levels')).json();
-        const actLevel = document.getElementById('act-level');
-        actLevel.innerHTML = levels.map(l => `<option value="${l.id}">${l.label}</option>`).join('');
+        try {
+            const [levels, roles, themes, types] = await Promise.all([
+                (await apiFetch('/levels')).json(),
+                (await apiFetch('/roles')).json(),
+                (await apiFetch('/themes')).json(),
+                (await apiFetch('/types')).json()
+            ]);
+            
+            const populateSelect = (id, data, defaultOpt = null) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                
+                let html = '';
+                if (defaultOpt) {
+                    html += `<option value="">${defaultOpt}</option>`;
+                }
+                html += data.map(i => `<option value="${i.id}">${i.label}</option>`).join('');
+                el.innerHTML = html;
+            };
 
-        const roles = await (await apiFetch('/roles')).json();
-        const actRole = document.getElementById('act-role');
-        actRole.innerHTML = roles.filter(r => r.label !== 'admin').map(r => `<option value="${r.id}">${r.label}</option>`).join('');
+            const activeRoles = roles.filter(r => r.label !== 'admin');
 
-        const themes = await (await apiFetch('/themes')).json();
-        const actTheme = document.getElementById('act-theme');
-        actTheme.innerHTML = themes.map(t => `<option value="${t.id}">${t.label}</option>`).join('');
+            populateSelect('act-level', levels);
+            populateSelect('adm-level', levels, 'Non défini');
 
-        const types = await (await apiFetch('/types')).json();
-        const actType = document.getElementById('act-type');
-        actType.innerHTML = types.map(t => `<option value="${t.id}">${t.label}</option>`).join('');
+            populateSelect('act-role', activeRoles);
+            populateSelect('adm-role', activeRoles);
+
+            populateSelect('act-theme', themes);
+            populateSelect('act-type', types);
+            
+        } catch (err) {
+            console.error("Erreur lors du chargement des métadonnées:", err);
+        }
     };
 
     const loadAdminData = async () => {
@@ -98,9 +130,35 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${a.type ? `<span>${a.type.label}</span>` : ''}
                     </div>
                 </div>
-                <button class="delete-btn" onclick="deleteActivity(${a.id})">Supprimer</button>
+                <div class="user-action-btns">
+                    <button class="delete-btn" onclick="deleteActivity(${a.id})">Supprimer la quête</button>
+                </div>
             </div>
         `).join('') || '<p>Aucune quête dans le grimoire.</p>';
+
+        // Load Users
+        const users = await (await apiFetch('/admin/users')).json();
+        adminUsersList.innerHTML = users.map(u => `
+            <div class="admin-list-item">
+                <div class="admin-list-item-info">
+                    <strong>${u.username}</strong>
+                    <div class="meta-badges">
+                        <span>${u.role ? u.role.label : 'Rôle ?'}</span>
+                        ${u.level ? `<span>${u.level.label}</span>` : ''}
+                        ${u.age ? `<span>${u.age} ans</span>` : ''}
+                    </div>
+                </div>
+                <div class="user-action-btns">
+                    ${u.role && u.role.label === 'parent' ? `<button class="manage-btn" onclick="openManageChildren(${u.id}, '${u.username}')">Gérer les Enfants</button>` : ''}
+                    <button class="reset-btn" onclick="resetPassword(${u.id})">Pass</button>
+                    <button class="delete-btn" onclick="deleteUser(${u.id})">X</button>
+                </div>
+            </div>
+        `).join('') || '<p>Aucun aventurier inscrit.</p>';
+
+        // Populate child select (only students)
+        const students = users.filter(u => u.role && u.role.label === 'élève');
+        childSelect.innerHTML = students.map(s => `<option value="${s.id}">${s.username} (${s.level ? s.level.label : 'Niveau ?'})</option>`).join('');
 
         // Load Pending Comments
         const pending = await (await apiFetch('/admin/comments/pending')).json();
@@ -135,6 +193,63 @@ document.addEventListener('DOMContentLoaded', () => {
             loadAdminData();
         }
     };
+
+    window.deleteUser = async (id) => {
+        if (confirm('Bannir cet aventurier définitivement ?')) {
+            await apiFetch(`/admin/users/${id}`, { method: 'DELETE' });
+            loadAdminData();
+        }
+    };
+
+    window.resetPassword = async (id) => {
+        const newPass = prompt("Entrez le nouveau mot de passe :");
+        if (newPass) {
+            await apiFetch(`/admin/users/${id}/reset-password`, {
+                method: 'PUT',
+                body: JSON.stringify({ new_password: newPass })
+            });
+            alert("Mot de passe réinitialisé !");
+        }
+    };
+
+    window.openManageChildren = async (parentId, parentName) => {
+        currentParentId = parentId;
+        parentNameDisplay.textContent = parentName;
+        manageChildrenModal.classList.remove('hidden');
+        loadChildren();
+    };
+
+    const loadChildren = async () => {
+        const users = await (await apiFetch('/admin/users')).json();
+        const parent = users.find(u => u.id === currentParentId);
+        if (parent && parent.children) {
+            childrenList.innerHTML = parent.children.map(c => `
+                <div class="admin-list-item">
+                    <span>${c.username}</span>
+                    <button class="delete-btn" onclick="removeRelationship(${c.id})">Détacher</button>
+                </div>
+            `).join('') || '<p>Aucun enfant associé.</p>';
+        }
+    };
+
+    window.removeRelationship = async (childId) => {
+        await apiFetch(`/admin/users/${currentParentId}/children/${childId}`, { method: 'DELETE' });
+        loadChildren();
+        loadAdminData();
+    };
+
+    addChildBtn.addEventListener('click', async () => {
+        const childId = childSelect.value;
+        if (childId) {
+            await apiFetch(`/admin/users/${currentParentId}/children/${childId}`, { method: 'POST' });
+            loadChildren();
+            loadAdminData();
+        }
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+        manageChildrenModal.classList.add('hidden');
+    });
 
     // --- Events ---
     adminLoginForm.addEventListener('submit', async (e) => {
@@ -171,15 +286,17 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('theme_id', document.getElementById('act-theme').value);
         formData.append('type_id', document.getElementById('act-type').value);
         
-        const videoUrl = document.getElementById('act-video').value;
-        if (videoUrl) {
-            formData.append('video_url', videoUrl);
-        }
-        
-        const fileInput = document.getElementById('act-file');
-        for (let i = 0; i < fileInput.files.length; i++) {
-            formData.append('files', fileInput.files[i]);
-        }
+        // Collect dynamic resources
+        const resourceRows = document.querySelectorAll('.resource-row');
+        resourceRows.forEach(row => {
+            const type = row.querySelector('.res-type').value;
+            const input = row.querySelector('.res-input');
+            if (type === 'link') {
+                if (input.value) formData.append('video_links', input.value);
+            } else if (type === 'file') {
+                if (input.files.length > 0) formData.append('files', input.files[0]);
+            }
+        });
 
         const res = await fetch('/activities', {
             method: 'POST',
@@ -190,9 +307,74 @@ document.addEventListener('DOMContentLoaded', () => {
         if (res.ok) {
             alert('Quête scellée avec succès !');
             e.target.reset();
+            resourcesListInputs.innerHTML = '';
             loadAdminData();
         } else {
-            alert('Erreur lors du scellement.');
+            const err = await res.json();
+            alert('Erreur lors du scellement : ' + (err.detail || 'Inconnue'));
+        }
+    });
+
+    // Dynamic resources logic
+    if (addResourceBtn) {
+        addResourceBtn.addEventListener('click', () => {
+            const count = document.querySelectorAll('.resource-row').length;
+            if (count >= 10) {
+                alert("Maximum 10 ressources autorisées.");
+                return;
+            }
+
+            const row = document.createElement('div');
+            row.className = 'admin-list-item resource-row';
+            row.innerHTML = `
+                <div class="resource-row-header">
+                    <select class="res-type">
+                        <option value="file">Fichier (PDF/Vidéo)</option>
+                        <option value="link">Lien Vidéo</option>
+                    </select>
+                    <button type="button" class="delete-btn remove-res-btn" title="Supprimer">X</button>
+                </div>
+                <div class="res-input-container">
+                    <input type="file" class="res-input" accept=".pdf,video/*" required>
+                </div>
+            `;
+
+            row.querySelector('.res-type').addEventListener('change', (e) => {
+                const container = row.querySelector('.res-input-container');
+                if (e.target.value === 'link') {
+                    container.innerHTML = `<input type="url" class="res-input" placeholder="Lien YouTube/Vimeo..." required>`;
+                } else {
+                    container.innerHTML = `<input type="file" class="res-input" accept=".pdf,video/*" required>`;
+                }
+            });
+
+            row.querySelector('.remove-res-btn').addEventListener('click', () => row.remove());
+
+            resourcesListInputs.appendChild(row);
+        });
+    }
+
+    adminAddUserForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const userData = {
+            username: document.getElementById('adm-username').value,
+            password: document.getElementById('adm-password').value,
+            role_id: parseInt(document.getElementById('adm-role').value),
+            level_id: document.getElementById('adm-level').value ? parseInt(document.getElementById('adm-level').value) : null
+        };
+        
+        const res = await apiFetch('/register', {
+            method: 'POST',
+            body: JSON.stringify(userData)
+        });
+
+        if (res.ok) {
+            alert('Aventurier inscrit avec succès !');
+            e.target.reset();
+            loadAdminData();
+        } else {
+            const err = await res.json();
+            alert('Erreur: ' + (err.detail || 'Échec'));
         }
     });
 

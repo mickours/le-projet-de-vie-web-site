@@ -70,6 +70,10 @@ class UserUpdate(BaseModel):
     password: Optional[str] = None
 
 
+class PasswordReset(BaseModel):
+    new_password: str
+
+
 class User(UserBase):
     model_config = ConfigDict(from_attributes=True)
     id: int
@@ -79,6 +83,7 @@ class User(UserBase):
     level_id: Optional[int] = None
     role: Optional[Role] = None
     level: Optional[Level] = None
+    children: List["User"] = []
 
 
 class UserWithToken(BaseModel):
@@ -91,6 +96,7 @@ class UserWithToken(BaseModel):
 class DocumentBase(BaseModel):
     filename: str
     url: str
+    doc_type: str = "pdf"
 
 
 class Document(DocumentBase):
