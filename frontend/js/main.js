@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (viewId === 'profile') loadProfile();
 
         if (updateHistory) {
-            const url = viewId === 'home' ? '/' : `/${viewId}`;
+            const url = viewId === 'home' ? '/adventure' : `/${viewId}`;
             history.pushState({ viewId }, '', url);
         }
     };
@@ -138,12 +138,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
         }
-        
-        const view = path.replace('/', '') || 'home';
+
+        const view = path.replace('/adventure', '').replace(/\//g, '') || 'home';
         const validViews = ['home', 'activities', 'dossier', 'profile', 'login'];
         switchView(validViews.includes(view) ? view : 'home', false);
     };
-
     const showApp = (user) => {
         currentUser = user;
         loginSection.classList.add('hidden');

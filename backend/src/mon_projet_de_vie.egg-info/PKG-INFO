@@ -1,0 +1,19 @@
+Metadata-Version: 2.4
+Name: mon-projet-de-vie
+Version: 0.1.0
+Summary: Add your description here
+Requires-Python: >=3.13
+Description-Content-Type: text/markdown
+Requires-Dist: alembic>=1.18
+Requires-Dist: fastapi>=0.128
+Requires-Dist: httpx>=0.28.1
+Requires-Dist: passlib[bcrypt]>=1.7.4
+Requires-Dist: pydantic>=2.12.5
+Requires-Dist: pydantic-settings>=2.1.0
+Requires-Dist: pytest>=9.0.2
+Requires-Dist: pytest-asyncio>=1.3.0
+Requires-Dist: python-jose[cryptography]>=3.5.0
+Requires-Dist: python-multipart>=0.0.21
+Requires-Dist: ruff>=0.15.6
+Requires-Dist: sqlalchemy>=2.0.48
+Requires-Dist: uvicorn>=0.40
