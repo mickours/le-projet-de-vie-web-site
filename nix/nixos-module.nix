@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 
@@ -7,7 +12,8 @@ let
   # Use the package defined in the flake or call it locally
   # For the module to be self-contained in the repo, we can use callPackage
   backendPackage = pkgs.callPackage ./package.nix { };
-in {
+in
+{
   options.services.aventure-orientation = {
     enable = mkEnableOption "L'aventure de l'Orientation service";
 
@@ -79,18 +85,33 @@ in {
       serviceConfig = {
         # We need to make sure the app can find its modules
         # Running gunicorn from the backend source directory
-        ExecStart = "${pkgs.python3.pkgs.gunicorn}/bin/gunicorn main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind ${cfg.host}:${toString cfg.port}";
+        ExecStart = "${
+          pkgs.python3.withPackages (p: [
+            p.uvicorn
+            p.gunicorn
+            p.fastapi
+            p.sqlalchemy
+            p.pydantic
+            p.pydantic-settings
+            p.python-jose
+            p.passlib
+            p.bcrypt
+            p.python-multipart
+            p.alembic
+            p.httpx
+          ])
+        }/bin/python -m gunicorn --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind ${cfg.host}:${toString cfg.port} main:app";
         WorkingDirectory = "${cfg.package}/share/aventure-orientation/backend-src";
-        
+
         StateDirectory = "aventure-orientation";
         # Ensure the uploads directory exists within dataDir
         ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p ${cfg.dataDir}/uploads";
-        
+
         EnvironmentFile = mkIf (cfg.secretKeyFile != null) cfg.secretKeyFile;
         User = "aventure-orientation";
         Group = "aventure-orientation";
         Restart = "always";
-        
+
         # Security hardening
         ProtectSystem = "full";
         NoNewPrivileges = true;
@@ -106,7 +127,7 @@ in {
       description = "Service user for L'aventure de l'Orientation";
     };
 
-    users.groups.aventure-orientation = {};
+    users.groups.aventure-orientation = { };
 
     # Optional Nginx configuration
     services.nginx = mkIf cfg.nginx.enable {
