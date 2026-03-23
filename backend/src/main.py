@@ -612,24 +612,24 @@ async def admin_page():
     return {"message": "Admin page not found"}
 
 
+@app.get("/")
+async def root():
+    index_path = os.path.join(frontend_path, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return {"message": "Landing page not found"}
+
+
 @app.get("/{full_path:path}")
 async def serve_frontend(full_path: str):
     # If the path looks like a file or an internal path, let static mount/404 handle it
     if "." in full_path or full_path.startswith(("uploads", "frontend")):
         raise HTTPException(status_code=404)
 
-    index_path = os.path.join(frontend_path, "index.html")
-    if os.path.exists(index_path):
-        return FileResponse(index_path)
-    return {"message": "Frontend index not found"}
-
-
-@app.get("/")
-async def root():
-    landing_path = os.path.join(frontend_path, "landing.html")
-    if os.path.exists(landing_path):
-        return FileResponse(landing_path)
-    return {"message": "Landing page not found"}
+    adventure_path = os.path.join(frontend_path, "adventure.html")
+    if os.path.exists(adventure_path):
+        return FileResponse(adventure_path)
+    return {"message": "Adventure app file not found"}
 
 
 if __name__ == "__main__":

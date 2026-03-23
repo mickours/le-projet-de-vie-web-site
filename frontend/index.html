@@ -3,287 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>L'aventure de l'Orientation</title>
+    <title>Mon projet de Vie me Libère</title>
     <link rel="icon" type="image/svg+xml" href="/frontend/favicon.svg">
     <link rel="stylesheet" href="/frontend/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .landing-hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            border: 5px solid var(--border-main);
+            box-shadow: 15px 15px 0 var(--border-main);
+            margin: 2rem;
+            border-radius: 20px;
+            padding: 2rem;
+            color: white;
+        }
+        .landing-title {
+            font-size: 3.5rem;
+            -webkit-text-stroke: 2px var(--border-main);
+            text-shadow: 5px 5px 0 var(--border-main);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+        .landing-subtitle {
+            font-size: 1.5rem;
+            background: white;
+            padding: 1rem 2rem;
+            border: 3px solid var(--border-main);
+            box-shadow: 5px 5px 0 var(--border-main);
+            margin-bottom: 2rem;
+            transform: rotate(-1deg);
+            color: var(--text-header);
+        }
+        .start-adventure-btn {
+            font-size: 1.5rem;
+            padding: 1rem 2rem;
+            background: white;
+            color: var(--text-header);
+            text-decoration: none;
+            border: 4px solid var(--border-main);
+            box-shadow: 8px 8px 0 var(--border-main);
+            transition: all 0.2s;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+        .start-adventure-btn:hover {
+            transform: scale(1.05) rotate(1deg);
+            box-shadow: 12px 12px 0 var(--accent-color);
+            background: var(--primary-light);
+        }
+        
+        .content-section {
+            background: white;
+            border: 4px solid var(--border-main);
+            box-shadow: 10px 10px 0 var(--border-main);
+            margin: 2rem;
+            border-radius: 15px;
+            padding: 2rem;
+        }
+        .content-section h2 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            border-bottom: 4px solid var(--border-main);
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+        .content-section p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .testimonial-card {
+            background: var(--bg-body);
+            border: 3px solid var(--border-main);
+            box-shadow: 6px 6px 0 var(--border-main);
+            padding: 1.5rem;
+            border-radius: 10px;
+            position: relative;
+        }
+        .testimonial-card::before {
+            content: '"';
+            font-size: 4rem;
+            color: var(--accent-color);
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            opacity: 0.5;
+            font-family: serif;
+        }
+        .testimonial-author {
+            font-weight: bold;
+            text-align: right;
+            margin-top: 1rem;
+            color: var(--primary-color);
+        }
+        
+        @media (max-width: 768px) {
+            .landing-title { font-size: 2rem; }
+            .landing-hero { margin: 1rem; padding: 1rem; }
+            .content-section { margin: 1rem; padding: 1.5rem; }
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <div class="header-container">
-            <h1><span class="icon">⚔️</span> L'aventure de l'Orientation</h1>
-            
-            <div id="user-info">
-                <button id="menu-toggle" aria-label="Ouvrir le menu">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-                
-                <div id="nav-wrapper">
-                    <nav id="main-nav">
-                        <button class="nav-btn" data-view="home">
-                            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-                            <span>Accueil</span>
-                        </button>
-                        <button class="nav-btn" data-view="activities">
-                            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M14.5 18l-4.5-4.5-4.5 4.5-1.5-1.5 6-6 6 6-1.5 1.5zM14.5 12l-4.5-4.5-4.5 4.5-1.5-1.5 6-6 6 6-1.5 1.5z"/></svg>
-                            <span>Quêtes</span>
-                        </button>
-                        <button class="nav-btn" data-view="dossier">
-                            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-                            <span>Dossier</span>
-                        </button>
-                        <button class="nav-btn" data-view="profile">
-                            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                            <span>Profil</span>
-                        </button>
-                    </nav>
-                    
-                    <div id="user-controls">
-                        <div id="user-display" class="hidden">
-                            <span id="avatar-display">👤</span>
-                            <span id="username-display"></span>
-                        </div>
-                        <button id="login-nav-btn" class="nav-btn">Connexion</button>
-                        <button id="logout-btn" title="Déconnexion" class="hidden">
-                            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
-    
-    <main id="app">
-        <!-- Section Connexion / Inscription -->
-        <section id="login-section" class="panel view">
-            <div id="login-box">
-                <h2><span class="icon">🗝️</span> Prêt pour l'aventure ?</h2>
-                <form id="login-form">
-                    <div class="form-group">
-                        <label for="username">Nom d'aventurier</label>
-                        <input type="text" id="username" autocomplete="username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Mot de passe</label>
-                        <input type="password" id="password" autocomplete="current-password" required>
-                    </div>
-                    <button type="submit">Se connecter</button>
-                </form>
-                <p class="hint">Nouveau ici ? <a href="#" id="show-register">Crée ton profil d'aventurier</a></p>
-            </div>
-
-            <div id="register-box" class="hidden">
-                <h2><span class="icon">✨</span> Nouvel Aventurier</h2>
-                <form id="register-form">
-                    <div class="form-group">
-                        <label for="reg-username">Nom d'aventurier</label>
-                        <input type="text" id="reg-username" autocomplete="username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="reg-password">Mot de passe</label>
-                        <input type="password" id="reg-password" autocomplete="new-password" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="reg-role">Ton rôle</label>
-                        <select id="reg-role" required></select>
-                    </div>
-                    <div class="form-group">
-                        <label for="reg-level">Ton niveau</label>
-                        <select id="reg-level" required></select>
-                    </div>
-                    <button type="submit">Rejoindre l'aventure</button>
-                </form>
-                <p class="hint">Déjà inscrit ? <a href="#" id="show-login">Retour à la connexion</a></p>
-            </div>
+    <main>
+        <section class="landing-hero">
+            <h1 class="landing-title">Mon projet de Vie<br>me Libère</h1>
+            <div class="landing-subtitle">Découvrez votre chemin vers l'épanouissement</div>
+            <p style="font-size: 1.2rem; max-width: 800px; margin: 0 auto 2rem auto; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
+                Cette plateforme est dédiée à la formation au bonheur à travers la découverte de son projet de vie.
+                Nous croyons que chaque individu a un potentiel unique qui ne demande qu'à s'exprimer.
+            </p>
+            <a href="/adventure" class="start-adventure-btn">🚀 Lancer l'Aventure de l'Orientation</a>
+        </section>
+        
+        <section class="content-section">
+            <h2>Qui sommes nous ?</h2>
+            <p>
+                Nous sommes un collectif de passionnés, d'éducateurs, de psychologues et de professionnels de l'orientation qui partagent une vision commune : <strong>l'orientation ne devrait pas être subie, mais choisie avec joie et conscience.</strong>
+            </p>
+            <p>
+                Notre équipe travaille chaque jour pour créer des outils innovants, ludiques et profondément humains, afin d'accompagner les jeunes (et les moins jeunes !) dans la définition de leur projet de vie. Nous croyons en une approche globale qui prend en compte non seulement les compétences, mais aussi les passions, les valeurs et les aspirations profondes de chacun.
+            </p>
         </section>
 
-        <!-- Section Accueil / Dashboard -->
-        <section id="home-section" class="panel view hidden">
-            <h2><span class="icon">🗺️</span> Ton Tableau de Bord</h2>
-            <p style="margin-bottom: 2rem;">Choisis ton parcours pour explorer les métiers et les formations selon ton profil.</p>
-            
-            <div class="dashboard-grid">
-                <div class="dashboard-group">
-                    <h3><span class="icon">👥</span> Explore par Rôle</h3>
-                    <div id="role-buttons" class="button-cloud"></div>
-                </div>
-                <div class="dashboard-group">
-                    <h3><span class="icon">🎓</span> Explore par Niveau</h3>
-                    <div id="level-buttons" class="button-cloud"></div>
-                </div>
-            </div>
+        <section class="content-section">
+            <h2>Pourquoi ce site ?</h2>
+            <p>
+                Le constat est simple : trop de personnes se sentent perdues au moment de choisir leur voie. La pression sociale, le manque d'informations claires et la peur de se tromper transforment souvent l'orientation en une source d'angoisse.
+            </p>
+            <p>
+                <strong>Mon projet de Vie me Libère</strong> a été conçu pour inverser cette tendance. Ce site est une boussole qui vous guide à travers différentes étapes de réflexion. En utilisant les codes visuels et narratifs du manga avec notre module <em>"L'Aventure de l'Orientation"</em>, nous souhaitons rendre cette quête de sens aussi passionnante qu'une véritable épopée. 
+            </p>
+            <p>
+                Ici, vous trouverez des articles, des outils d'introspection, et un parcours gamifié pour vous aider à construire un avenir qui vous ressemble vraiment.
+            </p>
         </section>
 
-        <!-- Section Activités (Liste) -->
-        <section id="activities-section" class="panel view hidden">
-            <div class="header-actions">
-                <h2><span class="icon">🏹</span> Tes quêtes disponibles</h2>
-                <div class="filters">
-                    <select id="level-filter">
-                        <option value="">Tous les niveaux</option>
-                    </select>
+        <section class="content-section">
+            <h2>Témoignages</h2>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <p>Grâce à la plateforme, j'ai enfin pu mettre des mots sur ce que je voulais vraiment faire. L'aspect 'quête' m'a énormément motivé à avancer dans mon dossier d'orientation sans que ça ressemble à un devoir d'école.</p>
+                    <div class="testimonial-author">— Lucas, Élève de 3ème</div>
+                </div>
+                <div class="testimonial-card">
+                    <p>En tant que parent, il est souvent difficile d'aborder le sujet de l'avenir sans créer de tensions. Ce site nous a offert un support neutre et amusant pour discuter des projets de notre fille.</p>
+                    <div class="testimonial-author">— Sophie, Maman de Léa</div>
+                </div>
+                <div class="testimonial-card">
+                    <p>Un outil fantastique qui dépoussière l'orientation ! Je l'utilise régulièrement avec mes élèves et je vois une réelle différence dans leur implication. Ils sont acteurs de leur parcours.</p>
+                    <div class="testimonial-author">— Marc, Professeur principal</div>
                 </div>
             </div>
-            <div id="activities-list" class="manga-grid"></div>
-        </section>
-
-        <!-- Section Détail Activité -->
-        <section id="activity-detail-section" class="panel view hidden">
-            <button class="back-btn">&larr; Retour aux quêtes</button>
-            <div id="activity-content">
-                <!-- Contenu injecté -->
-            </div>
-
-            <div class="activity-actions hidden" id="authenticated-actions">
-                <h3><span class="icon">🏆</span> Ma Progression</h3>
-                <div class="progression-grid">
-                    <div class="form-group">
-                        <label class="checkbox-container">
-                            <input type="checkbox" id="quest-completed"> 
-                            <span>Quête terminée !</span>
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label for="quest-notes">Mes notes d'aventurier</label>
-                        <textarea id="quest-notes" rows="3" placeholder="Qu'as-tu appris aujourd'hui ?"></textarea>
-                    </div>
-                </div>
-                <button id="save-progress-btn">Enregistrer mon exploit</button>
-            </div>
-
-            <div class="activity-actions" id="guest-actions">
-                <h3><span class="icon">🚀</span> Envie de rejoindre l'aventure ?</h3>
-                <p>Connecte-toi pour créer ton dossier personnalisé, enregistrer ta progression et partager tes impressions avec les autres aventuriers !</p>
-                <button class="mt-2 start-adventure-btn">Démarrer mon aventure</button>
-            </div>
-
-            <div class="comments-section">
-                <h3><span class="icon">💬</span> Commentaires</h3>
-                <div id="comments-list"></div>
-                <form id="comment-form" class="hidden">
-                    <textarea id="comment-input" placeholder="Partage ton avis..." required></textarea>
-                    <button type="submit">Envoyer</button>
-                </form>
-                <div id="guest-comment-msg" class="mt-1">
-                    <p><em>Connecte-toi pour ajouter un commentaire.</em></p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section Mon Dossier -->
-        <section id="dossier-section" class="panel view hidden">
-            <div class="header-actions">
-                <h2><span class="icon">📜</span> Mon Dossier Personnel</h2>
-                <button id="print-btn">Imprimer mon dossier</button>
-            </div>
-            <div id="dossier-content">
-                <!-- Liste des activités terminées -->
-            </div>
-        </section>
-
-        <!-- Section Profil -->
-        <section id="profile-section" class="panel view hidden">
-            <h2><span class="icon">🎭</span> Mon Profil</h2>
-            <p>Gère tes informations d'aventurier !</p>
-            
-            <form id="profile-form" class="mt-2">
-                <div class="form-grid-profile">
-                    <div class="form-group">
-                        <label for="prof-username">Nom d'aventurier</label>
-                        <input type="text" id="prof-username" autocomplete="username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="prof-age">Ton âge</label>
-                        <input type="number" id="prof-age" min="1" max="120">
-                    </div>
-                    <div class="form-group">
-                        <label for="prof-role">Ton rôle</label>
-                        <select id="prof-role" required></select>
-                    </div>
-                    <div class="form-group">
-                        <label for="prof-level">Ton niveau</label>
-                        <select id="prof-level" required></select>
-                    </div>
-                    <div class="form-group" style="grid-column: span 2;">
-                        <label for="prof-password">Nouveau mot de passe (laisser vide pour ne pas changer)</label>
-                        <input type="password" id="prof-password" autocomplete="new-password" placeholder="********">
-                    </div>
-                </div>
-
-                <h3 class="mt-2">Choisir un Avatar</h3>
-                <div class="avatar-grid mb-2">
-                    <label class="avatar-option">
-                        <input type="radio" name="avatar" value="👤" checked>
-                        <span class="avatar-icon">👤</span>
-                        <span class="avatar-name">Classique</span>
-                    </label>
-                    <label class="avatar-option">
-                        <input type="radio" name="avatar" value="🥷">
-                        <span class="avatar-icon">🥷</span>
-                        <span class="avatar-name">Ninja</span>
-                    </label>
-                    <label class="avatar-option">
-                        <input type="radio" name="avatar" value="🧙">
-                        <span class="avatar-icon">🧙</span>
-                        <span class="avatar-name">Sorcier</span>
-                    </label>
-                    <label class="avatar-option">
-                        <input type="radio" name="avatar" value="🤺">
-                        <span class="avatar-icon">🤺</span>
-                        <span class="avatar-name">Épéiste</span>
-                    </label>
-                    <label class="avatar-option">
-                        <input type="radio" name="avatar" value="🏴‍☠️">
-                        <span class="avatar-icon">🏴‍☠️</span>
-                        <span class="avatar-name">Pirate</span>
-                    </label>
-                    <label class="avatar-option">
-                        <input type="radio" name="avatar" value="🤖">
-                        <span class="avatar-icon">🤖</span>
-                        <span class="avatar-name">Mecha</span>
-                    </label>
-                    <label class="avatar-option">
-                        <input type="radio" name="avatar" value="🦸">
-                        <span class="avatar-icon">🦸</span>
-                        <span class="avatar-name">Héros</span>
-                    </label>
-                    <label class="avatar-option">
-                        <input type="radio" name="avatar" value="🧛">
-                        <span class="avatar-icon">🧛</span>
-                        <span class="avatar-name">Vampire</span>
-                    </label>
-                    <label class="avatar-option">
-                        <input type="radio" name="avatar" value="🧚">
-                        <span class="avatar-icon">🧚</span>
-                        <span class="avatar-name">Fée</span>
-                    </label>
-                    <label class="avatar-option">
-                        <input type="radio" name="avatar" value="🧜">
-                        <span class="avatar-icon">🧜</span>
-                        <span class="avatar-name">Sirène</span>
-                    </label>
-                    <label class="avatar-option">
-                        <input type="radio" name="avatar" value="🐉">
-                        <span class="avatar-icon">🐉</span>
-                        <span class="avatar-name">Dragon</span>
-                    </label>
-                    <label class="avatar-option">
-                        <input type="radio" name="avatar" value="👺">
-                        <span class="avatar-icon">👺</span>
-                        <span class="avatar-name">Oni</span>
-                    </label>
-                </div>
-                <button type="submit">Enregistrer les changements</button>
-            </form>
         </section>
     </main>
-
     <footer>
-        <p>&copy; 2026 L'aventure de l'Orientation - <span id="current-role">Visiteur</span></p>
+        <p style="text-align: center; padding: 2rem; font-family: 'Comic Neue', cursive; font-weight: bold; color: var(--text-body);">
+            &copy; 2026 Mon projet de Vie me Libère
+        </p>
     </footer>
-
-    <script src="/frontend/js/main.js"></script>
 </body>
 </html>
