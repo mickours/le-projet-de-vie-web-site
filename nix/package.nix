@@ -4,7 +4,7 @@
 }:
 
 python3.pkgs.buildPythonApplication rec {
-  pname = "aventure-orientation";
+  pname = "mon-projet-de-vie";
   version = "0.1.0";
   format = "pyproject";
 
@@ -41,9 +41,9 @@ python3.pkgs.buildPythonApplication rec {
   # We want to include the frontend and backend in the package
   # The app expects frontend to be in a certain relative path
   postInstall = ''
-    mkdir -p $out/share/aventure-orientation
-    cp -r ../frontend $out/share/aventure-orientation/
-    cp -r ../backend/src $out/share/aventure-orientation/backend-src
+    mkdir -p $out/share/mon-projet-de-vie
+    cp -r ../frontend $out/share/mon-projet-de-vie/
+    cp -r ../backend/src $out/share/mon-projet-de-vie/backend-src
   '';
 
   doCheck = false;

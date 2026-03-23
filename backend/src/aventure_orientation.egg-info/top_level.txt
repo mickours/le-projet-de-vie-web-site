@@ -1,8 +1,0 @@
-auth
-config
-database
-main
-models
-schemas
-seed
-tests

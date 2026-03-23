@@ -8,13 +8,13 @@
 with lib;
 
 let
-  cfg = config.services.aventure-orientation;
+  cfg = config.services.mon-projet-de-vie;
   # Use the package defined in the flake or call it locally
   # For the module to be self-contained in the repo, we can use callPackage
   backendPackage = pkgs.callPackage ./package.nix { };
 in
 {
-  options.services.aventure-orientation = {
+  options.services.mon-projet-de-vie = {
     enable = mkEnableOption "L'aventure de l'Orientation service";
 
     port = mkOption {
@@ -31,7 +31,7 @@ in
 
     databaseUrl = mkOption {
       type = types.str;
-      default = "sqlite:////var/lib/aventure-orientation/monprojetdevie.db";
+      default = "sqlite:////var/lib/mon-projet-de-vie/monprojetdevie.db";
       description = "Database connection URL (use absolute paths for SQLite).";
     };
 
@@ -49,7 +49,7 @@ in
 
     dataDir = mkOption {
       type = types.path;
-      default = "/var/lib/aventure-orientation";
+      default = "/var/lib/mon-projet-de-vie";
       description = "Directory for database and uploads.";
     };
 
@@ -70,7 +70,22 @@ in
   };
 
   config = mkIf cfg.enable {
-    systemd.services.aventure-orientation = {
+    systemd.services.mon-projet-de-vie = let
+      pythonEnv = pkgs.python3.withPackages (p: [
+        p.uvicorn
+        p.gunicorn
+        p.fastapi
+        p.sqlalchemy
+        p.pydantic
+        p.pydantic-settings
+        p.python-jose
+        p.passlib
+        p.bcrypt
+        p.python-multipart
+        p.alembic
+        p.httpx
+      ]);
+    in {
       description = "L'aventure de l'Orientation Backend Service";
       after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
@@ -78,38 +93,27 @@ in
       environment = {
         DATABASE_URL = cfg.databaseUrl;
         ALLOWED_ORIGINS = builtins.toJSON cfg.allowedOrigins;
-        FRONTEND_PATH = "${cfg.package}/share/aventure-orientation/frontend";
+        FRONTEND_PATH = "${cfg.package}/share/mon-projet-de-vie/frontend";
         UPLOADS_PATH = "${cfg.dataDir}/uploads";
       };
 
       serviceConfig = {
         # We need to make sure the app can find its modules
         # Running gunicorn from the backend source directory
-        ExecStart = "${
-          pkgs.python3.withPackages (p: [
-            p.uvicorn
-            p.gunicorn
-            p.fastapi
-            p.sqlalchemy
-            p.pydantic
-            p.pydantic-settings
-            p.python-jose
-            p.passlib
-            p.bcrypt
-            p.python-multipart
-            p.alembic
-            p.httpx
-          ])
-        }/bin/python -m gunicorn --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind ${cfg.host}:${toString cfg.port} main:app";
-        WorkingDirectory = "${cfg.package}/share/aventure-orientation/backend-src";
+        ExecStart = "${pythonEnv}/bin/python -m gunicorn --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind ${cfg.host}:${toString cfg.port} main:app";
+        WorkingDirectory = "${cfg.package}/share/mon-projet-de-vie/backend-src";
 
-        StateDirectory = "aventure-orientation";
-        # Ensure the uploads directory exists within dataDir
-        ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p ${cfg.dataDir}/uploads";
+        StateDirectory = "mon-projet-de-vie";
+        # Ensure the uploads directory exists within dataDir and seed the database
+        ExecStartPre = [
+          "+${pkgs.coreutils}/bin/mkdir -p ${cfg.dataDir}/uploads"
+          "+${pkgs.coreutils}/bin/chown -R mon-projet-de-vie:mon-projet-de-vie ${cfg.dataDir}"
+          "${pythonEnv}/bin/python seed.py"
+        ];
 
         EnvironmentFile = mkIf (cfg.secretKeyFile != null) cfg.secretKeyFile;
-        User = "aventure-orientation";
-        Group = "aventure-orientation";
+        User = "mon-projet-de-vie";
+        Group = "mon-projet-de-vie";
         Restart = "always";
 
         # Security hardening
@@ -119,15 +123,15 @@ in
       };
     };
 
-    users.users.aventure-orientation = {
+    users.users.mon-projet-de-vie = {
       isSystemUser = true;
-      group = "aventure-orientation";
+      group = "mon-projet-de-vie";
       home = cfg.dataDir;
       createHome = true;
       description = "Service user for L'aventure de l'Orientation";
     };
 
-    users.groups.aventure-orientation = { };
+    users.groups.mon-projet-de-vie = { };
 
     # Optional Nginx configuration
     services.nginx = mkIf cfg.nginx.enable {

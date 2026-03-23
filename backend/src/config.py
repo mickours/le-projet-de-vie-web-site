@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     UPLOADS_PATH: Optional[str] = None
 
     # Authentication Settings
-    SECRET_KEY: str = "aventure-orientation-super-secret-key"
+    SECRET_KEY: str = "mon-projet-de-vie-super-secret-key"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
