@@ -27,7 +27,25 @@ SECRET_KEY=votre_cle_secrete_tres_longue_et_aleatoire
 ALLOWED_ORIGINS=["https://votre-domaine.fr"]
 ```
 
-## 3. Déploiement avec Gunicorn
+## 3. Initialisation de la Base de Données
+
+Avant de lancer le serveur, vous devez initialiser la base de données pour créer les rôles, les niveaux et l'utilisateur administrateur par défaut.
+
+Exécutez le script de "seeding" :
+
+```bash
+cd backend/src
+uv run python seed.py
+```
+
+### Administrateur par défaut
+Une fois le script exécuté, vous pourrez vous connecter avec les identifiants suivants :
+- **Identifiant** : `admin`
+- **Mot de passe** : `admin123`
+
+**⚠️ IMPORTANT :** Il est fortement recommandé de changer le mot de passe de l'administrateur dès votre première connexion (via l'interface de profil ou via la base de données).
+
+## 4. Déploiement avec Gunicorn
 
 En production, n'utilisez pas `uvicorn` directement. Utilisez `gunicorn` pour gérer plusieurs processus.
 
