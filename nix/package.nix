@@ -1,5 +1,6 @@
-{ lib
-, python3
+{
+  lib,
+  python3,
 }:
 
 python3.pkgs.buildPythonApplication rec {
@@ -7,7 +8,12 @@ python3.pkgs.buildPythonApplication rec {
   version = "0.1.0";
   format = "pyproject";
 
-  src = ../.;
+  srcs = [
+    ../backend
+    ../frontend
+  ];
+
+  sourceRoot = "backend";
 
   nativeBuildInputs = with python3.pkgs; [
     setuptools
@@ -25,14 +31,19 @@ python3.pkgs.buildPythonApplication rec {
     passlib
     bcrypt
     python-multipart
+    pytest
+    pytest-asyncio
+    alembic
+    httpx
+    ruff
   ];
 
   # We want to include the frontend and backend in the package
   # The app expects frontend to be in a certain relative path
   postInstall = ''
     mkdir -p $out/share/aventure-orientation
-    cp -r frontend $out/share/aventure-orientation/
-    cp -r backend/src $out/share/aventure-orientation/backend-src
+    cp -r ../frontend $out/share/aventure-orientation/
+    cp -r ../backend/src $out/share/aventure-orientation/backend-src
   '';
 
   doCheck = false;

@@ -6,9 +6,15 @@
     utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, utils }:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      utils,
+    }:
     let
-      out = utils.lib.eachDefaultSystem (system:
+      out = utils.lib.eachDefaultSystem (
+        system:
         let
           pkgs = import nixpkgs { inherit system; };
         in
@@ -31,7 +37,8 @@
         }
       );
     in
-    out // {
+    out
+    // {
       nixosModules.default = import ./nix/nixos-module.nix;
     };
 }
