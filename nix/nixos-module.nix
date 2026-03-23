@@ -133,6 +133,8 @@ in
     services.nginx = mkIf cfg.nginx.enable {
       enable = true;
       virtualHosts."${cfg.nginx.hostName}" = {
+        forceSSL = true;
+        enableACME = true;
         locations."/" = {
           proxyPass = "http://${cfg.host}:${toString cfg.port}";
           proxyWebsockets = true;
