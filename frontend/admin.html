@@ -74,8 +74,9 @@
             <div id="admin-activities" class="tab-content">
                 <div class="admin-split">
                     <div class="admin-form-col">
-                        <h3>Ajouter une nouvelle quête</h3>
+                        <h3 id="form-act-title">Ajouter une nouvelle quête</h3>
                         <form id="add-activity-form">
+                            <input type="hidden" id="act-id">
                             <div class="form-group">
                                 <label for="act-title">Titre de la quête</label>
                                 <input type="text" id="act-title" placeholder="Ex: Découvrir les métiers du web" required>
@@ -110,12 +111,18 @@
                                     <h4 style="margin: 0; color: var(--text-header); font-size: 1.1rem;">Ressources (PDF ou Vidéo)</h4>
                                     <button type="button" id="add-resource-btn" class="approve-btn" style="box-shadow: 3px 3px 0 var(--border-main);">+ Ajouter une ressource</button>
                                 </div>
+                                <div id="existing-resources-list" class="admin-list-container mb-2">
+                                    <!-- Ressources existantes (édition) -->
+                                </div>
                                 <div id="resources-list-inputs" class="admin-list-container">
-                                    <!-- Lignes de ressources ajoutées ici -->
+                                    <!-- Lignes de nouvelles ressources ajoutées ici -->
                                 </div>
                             </div>
 
-                            <button type="submit" style="width: 100%; margin-top: 2rem;">Sceller la quête</button>
+                            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                                <button type="submit" id="submit-act-btn" style="flex-grow: 1;">Sceller la quête</button>
+                                <button type="button" id="cancel-edit-btn" class="hidden" style="background: var(--bg-body); color: var(--text-body); box-shadow: 4px 4px 0 var(--border-main); border: 3px solid var(--border-main); font-weight: bold; border-radius: 8px; cursor: pointer;">Annuler</button>
+                            </div>
                         </form>
                     </div>
                     <div class="admin-list-col">

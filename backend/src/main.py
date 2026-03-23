@@ -315,6 +315,106 @@ async def get_activity(activity_id: int, db: Session = Depends(get_db)):
     return activity
 
 
+@app.put(
+    "/activities/{activity_id}", response_model=schemas.Activity, tags=["Activities"]
+)
+async def update_activity(
+    activity_id: int,
+    title: str = Form(...),
+    description: Optional[str] = Form(None),
+    level_id: int = Form(...),
+    theme_id: int = Form(...),
+    type_id: int = Form(...),
+    role_id: Optional[int] = Form(None),
+    video_links: List[str] = Form([]),
+    files: List[UploadFile] = File([]),
+    db: Session = Depends(get_db),
+    admin: models.User = Depends(get_current_admin),
+):
+    activity = (
+        db.query(models.Activity).filter(models.Activity.id == activity_id).first()
+    )
+    if not activity:
+        raise HTTPException(status_code=404, detail="Activity not found")
+
+    # Limit check including existing documents
+    new_resources_count = len([f for f in files if f.filename]) + len(
+        [v for v in video_links if v.strip()]
+    )
+    if len(activity.documents) + new_resources_count > 10:
+        raise HTTPException(
+            status_code=400, detail="Maximum 10 resources allowed per quest"
+        )
+
+    activity.title = title
+    activity.description = description
+    activity.level_id = level_id
+    activity.theme_id = theme_id
+    activity.type_id = type_id
+    activity.role_id = role_id
+
+    # Process Video Links
+    for link in video_links:
+        if not link.strip():
+            continue
+        db_doc = models.Document(
+            filename="Vidéo (Lien)",
+            url=link.strip(),
+            doc_type="video_link",
+            activity_id=activity.id,
+        )
+        db.add(db_doc)
+
+    # Process Files
+    for file in files:
+        if not file.filename:
+            continue
+        file_location = os.path.join(uploads_path, file.filename)
+        with open(file_location, "wb") as buffer:
+            buffer.write(await file.read())
+
+        ext = os.path.splitext(file.filename)[1].lower()
+        doc_type = "pdf"
+        if ext in [".mp4", ".webm", ".ogg", ".mov", ".avi"]:
+            doc_type = "video_file"
+
+        db_doc = models.Document(
+            filename=file.filename,
+            url=f"/uploads/{file.filename}",
+            doc_type=doc_type,
+            activity_id=activity.id,
+        )
+        db.add(db_doc)
+
+    db.commit()
+    db.refresh(activity)
+    return activity
+
+
+@app.delete("/documents/{document_id}", tags=["Activities"])
+async def delete_document(
+    document_id: int,
+    db: Session = Depends(get_db),
+    admin: models.User = Depends(get_current_admin),
+):
+    document = (
+        db.query(models.Document).filter(models.Document.id == document_id).first()
+    )
+    if not document:
+        raise HTTPException(status_code=404, detail="Document not found")
+    
+    # Optionally delete the file from disk if it's a file
+    if document.doc_type in ["pdf", "video_file"]:
+        filename = os.path.basename(document.url)
+        file_path = os.path.join(uploads_path, filename)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+    db.delete(document)
+    db.commit()
+    return {"status": "Document deleted"}
+
+
 @app.delete("/activities/{activity_id}", tags=["Activities"])
 async def delete_activity(
     activity_id: int,

@@ -131,7 +131,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
                 <div class="user-action-btns">
-                    <button class="delete-btn" onclick="deleteActivity(${a.id})">Supprimer la quête</button>
+                    <button class="manage-btn" onclick="editActivity(${a.id})" style="background: var(--primary-color); color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">Modifier</button>
+                    <button class="delete-btn" onclick="deleteActivity(${a.id})">Supprimer</button>
                 </div>
             </div>
         `).join('') || '<p>Aucune quête dans le grimoire.</p>';
@@ -193,6 +194,76 @@ document.addEventListener('DOMContentLoaded', () => {
             loadAdminData();
         }
     };
+
+    window.deleteDocument = async (docId, actId) => {
+        if (confirm('Voulez-vous vraiment supprimer cette ressource ?')) {
+            try {
+                const res = await apiFetch(`/documents/${docId}`, { method: 'DELETE' });
+                if (res.ok) {
+                    window.editActivity(actId); // Refresh the edit view to show remaining resources
+                } else {
+                    alert("Erreur lors de la suppression de la ressource.");
+                }
+            } catch (err) {
+                alert("Erreur réseau.");
+            }
+        }
+    };
+
+    window.editActivity = async (id) => {
+        try {
+            const act = await (await apiFetch(`/activities/${id}`)).json();
+            document.getElementById('act-id').value = act.id;
+            document.getElementById('act-title').value = act.title || '';
+            document.getElementById('act-desc').value = act.description || '';
+            document.getElementById('act-level').value = act.level_id || '';
+            document.getElementById('act-role').value = act.role_id || '';
+            document.getElementById('act-theme').value = act.theme_id || '';
+            document.getElementById('act-type').value = act.type_id || '';
+            
+            document.getElementById('form-act-title').textContent = "Modifier la quête";
+            document.getElementById('submit-act-btn').textContent = "Mettre à jour la quête";
+            document.getElementById('cancel-edit-btn').classList.remove('hidden');
+            document.getElementById('quest-resources-section').style.display = 'block';
+            resourcesListInputs.innerHTML = ''; // Clear new resources list
+
+            const existingResList = document.getElementById('existing-resources-list');
+            if (act.documents && act.documents.length > 0) {
+                existingResList.innerHTML = act.documents.map(d => `
+                    <div class="admin-list-item" style="background: var(--bg-body);">
+                        <div class="resource-row-header" style="flex-grow: 1;">
+                            <span style="font-weight: bold;">${d.doc_type === 'video_link' ? '🔗 Lien Vidéo' : '📄 Fichier'}:</span> 
+                            <span style="margin-left: 0.5rem; word-break: break-all;">${d.filename}</span>
+                        </div>
+                        <button type="button" class="delete-btn" title="Supprimer cette ressource" onclick="deleteDocument(${d.id}, ${act.id})">Supprimer</button>
+                    </div>
+                `).join('');
+            } else {
+                existingResList.innerHTML = '<p style="font-size: 0.9rem; color: #666;">Aucune ressource existante pour cette quête.</p>';
+            }
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch (err) {
+            alert('Erreur lors de la récupération de la quête.');
+        }
+    };
+
+    const resetActivityForm = () => {
+        addActivityForm.reset();
+        document.getElementById('act-id').value = '';
+        document.getElementById('form-act-title').textContent = "Ajouter une nouvelle quête";
+        document.getElementById('submit-act-btn').textContent = "Sceller la quête";
+        document.getElementById('cancel-edit-btn').classList.add('hidden');
+        document.getElementById('quest-resources-section').style.display = 'block';
+        document.getElementById('existing-resources-list').innerHTML = '';
+        resourcesListInputs.innerHTML = '';
+    };
+
+    const cancelEditBtn = document.getElementById('cancel-edit-btn');
+    if (cancelEditBtn) {
+        cancelEditBtn.addEventListener('click', resetActivityForm);
+    }
 
     window.deleteUser = async (id) => {
         if (confirm('Bannir cet aventurier définitivement ?')) {
@@ -278,6 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     addActivityForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        const actId = document.getElementById('act-id').value;
         const formData = new FormData();
         formData.append('title', document.getElementById('act-title').value);
         formData.append('description', document.getElementById('act-desc').value);
@@ -286,7 +358,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('theme_id', document.getElementById('act-theme').value);
         formData.append('type_id', document.getElementById('act-type').value);
         
-        // Collect dynamic resources
+        // Collect new dynamic resources (works for both creation and update)
         const resourceRows = document.querySelectorAll('.resource-row');
         resourceRows.forEach(row => {
             const type = row.querySelector('.res-type').value;
@@ -298,20 +370,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        const res = await fetch('/activities', {
-            method: 'POST',
+        const url = actId ? `/activities/${actId}` : '/activities';
+        const method = actId ? 'PUT' : 'POST';
+
+        const res = await fetch(url, {
+            method: method,
             headers: { 'Authorization': `Bearer ${token}` },
             body: formData
         });
 
         if (res.ok) {
-            alert('Quête scellée avec succès !');
-            e.target.reset();
-            resourcesListInputs.innerHTML = '';
+            alert(actId ? 'Quête mise à jour avec succès !' : 'Quête scellée avec succès !');
+            resetActivityForm();
             loadAdminData();
         } else {
             const err = await res.json();
-            alert('Erreur lors du scellement : ' + (err.detail || 'Inconnue'));
+            alert('Erreur lors de l\'enregistrement : ' + (err.detail || 'Inconnue'));
         }
     });
 
