@@ -101,6 +101,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const views = document.querySelectorAll('.view');
     const navButtons = document.querySelectorAll('.nav-btn');
 
+    // Back home buttons
+    const backHomeBtns = document.querySelectorAll('.back-home-btn');
+    backHomeBtns.forEach(btn => {
+        btn.addEventListener('click', () => switchView('home'));
+    });
+
+
     // Home View
     const homeSection = document.getElementById('home-section');
     const roleButtons = document.getElementById('role-buttons');
