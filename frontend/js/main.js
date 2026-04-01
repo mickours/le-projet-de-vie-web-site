@@ -1,3 +1,85 @@
+
+// --- Custom UI Utilities ---
+window.showModal = function(message) {
+    return new Promise((resolve) => {
+        let overlay = document.querySelector(".custom-modal-overlay");
+        if (!overlay) {
+            overlay = document.createElement("div");
+            overlay.className = "custom-modal-overlay";
+            overlay.innerHTML = `
+                <div class="custom-modal">
+                    <p id="custom-modal-text"></p>
+                    <button id="custom-modal-btn" class="modal-btn">Compris !</button>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+        
+        document.getElementById("custom-modal-text").innerText = message;
+        
+        const btn = document.getElementById("custom-modal-btn");
+        const close = () => {
+            overlay.classList.remove("active");
+            btn.removeEventListener("click", close);
+            resolve();
+        };
+        btn.addEventListener("click", close);
+        
+        setTimeout(() => overlay.classList.add("active"), 10);
+    });
+};
+
+window.alert = window.showModal;
+
+// Global Fetch Interceptor for Button Loaders
+const originalFetch = window.fetch;
+window.activeActionButton = null;
+
+document.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (btn) {
+        window.activeActionButton = btn;
+        // Clear it after a short delay in case no fetch is triggered
+        setTimeout(() => { 
+            if (window.activeActionButton === btn && !btn.classList.contains('loading')) {
+                window.activeActionButton = null; 
+            }
+        }, 50);
+    }
+}, true);
+
+document.addEventListener('submit', (e) => {
+    const btn = e.submitter || e.target.querySelector("button[type='submit']");
+    if (btn) {
+        window.activeActionButton = btn;
+    }
+}, true);
+
+window.fetch = async function(...args) {
+    const btn = window.activeActionButton;
+    let originalText, originalWidth;
+    
+    // Only wrap if it's a button and not already loading
+    if (btn && !btn.classList.contains("loading")) {
+        originalText = btn.innerHTML;
+        originalWidth = btn.offsetWidth;
+        btn.style.width = originalWidth + "px";
+        btn.classList.add("loading");
+    }
+    
+    try {
+        return await originalFetch.apply(this, args);
+    } finally {
+        if (btn && btn.classList.contains("loading")) {
+            btn.classList.remove("loading");
+            btn.style.width = "";
+            btn.innerHTML = originalText;
+            window.activeActionButton = null;
+        }
+    }
+};
+// --- End Custom UI Utilities ---
+
 document.addEventListener('DOMContentLoaded', () => {
     // --- Elements ---
     const loginForm = document.getElementById('login-form');
