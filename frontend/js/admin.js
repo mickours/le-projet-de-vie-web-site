@@ -2,30 +2,30 @@
 // --- Custom UI Utilities ---
 window.showModal = function(message) {
     return new Promise((resolve) => {
-        let overlay = document.querySelector(".custom-modal-overlay");
-        if (!overlay) {
-            overlay = document.createElement("div");
-            overlay.className = "custom-modal-overlay";
-            overlay.innerHTML = `
-                <div class="custom-modal">
-                    <p id="custom-modal-text"></p>
-                    <button id="custom-modal-btn" class="modal-btn">Compris !</button>
-                </div>
-            `;
-            document.body.appendChild(overlay);
-        }
+        let overlay = document.createElement("div");
+        overlay.className = "custom-modal-overlay";
+        overlay.innerHTML = `
+            <div class="custom-modal">
+                <p>${message}</p>
+                <button class="modal-btn" style="display: block; margin: 0 auto;">Compris !</button>
+            </div>
+        `;
+        document.body.appendChild(overlay);
         
-        document.getElementById("custom-modal-text").innerText = message;
+        // Trigger reflow
+        overlay.offsetWidth;
+        overlay.classList.add("active");
         
-        const btn = document.getElementById("custom-modal-btn");
-        const close = () => {
+        const btn = overlay.querySelector("button");
+        btn.addEventListener("click", () => {
             overlay.classList.remove("active");
-            btn.removeEventListener("click", close);
+            setTimeout(() => {
+                if (document.body.contains(overlay)) {
+                    document.body.removeChild(overlay);
+                }
+            }, 300);
             resolve();
-        };
-        btn.addEventListener("click", close);
-        
-        setTimeout(() => overlay.classList.add("active"), 10);
+        });
     });
 };
 
