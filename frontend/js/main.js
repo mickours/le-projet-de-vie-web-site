@@ -745,3 +745,17 @@ document.addEventListener('DOMContentLoaded', () => {
         handleInitialRouting();
     }
 });
+
+
+
+// Global function for password toggle
+window.togglePasswordVisibility = function(button) {
+    const input = button.parentElement.querySelector("input");
+    if (input.type === "password") {
+        input.type = "text";
+        button.textContent = "🙈";
+    } else {
+        input.type = "password";
+        button.textContent = "👁️";
+    }
+};

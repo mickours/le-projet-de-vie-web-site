@@ -19,7 +19,6 @@ from auth import (
     get_current_user,
 )
 
-models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="L'aventure de l'Orientation",

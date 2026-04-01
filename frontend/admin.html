@@ -56,7 +56,10 @@
                 </div>
                 <div class="form-group">
                     <label for="password">Clé de sécurité</label>
-                    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" required>
+                    <div class="password-wrapper">
+                            <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" required>
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility(this)" title="Afficher/Masquer le mot de passe">👁️</button>
+                        </div>
                 </div>
                 <button type="submit" style="width: 100%; margin-top: 1rem;">Ouvrir le portail</button>
             </form>
@@ -143,7 +146,10 @@
                             </div>
                             <div class="form-group">
                                 <label for="adm-password">Mot de passe initial</label>
-                                <input type="password" id="adm-password" autocomplete="new-password" required>
+                                <div class="password-wrapper">
+                            <input type="password" id="adm-password" autocomplete="new-password" required>
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility(this)" title="Afficher/Masquer le mot de passe">👁️</button>
+                        </div>
                             </div>
                             <div class="form-grid-profile">
                                 <div class="form-group">

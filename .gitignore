@@ -1,5 +1,5 @@
-backend/src/__pycache__
-backend/src/tests/__pycache__
 backend/uploads
 backend/monprojetdevie.db
+backend/src/monprojetdevie.db
+*__pycache__*
 backend/src/monprojetdevie.db

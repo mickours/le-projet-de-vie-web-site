@@ -1,0 +1,7 @@
+- [X] Compétence vers Connaissance de Soi: Fait avec ajout de migration de base de donnée
+- [ ] Ajouter un bouton retour sur les pages
+- [ ] Plus de retour utilisateur (barre de chargement, modale dans le theme du site, message d'erreur claire en cas d'erreur)
+- [ ] Permetre d'ajouter un logo a la quête
+- [ ] Un éditeur WYSIWYG pour la description des quêtes avec la capacité de collé depuis Word
+- [ ] Ajouter Etudiant dans les Niveaux
+- [ ] Ajouter avatar de nous deux dans la partie qui somme nous

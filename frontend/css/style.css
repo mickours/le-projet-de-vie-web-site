@@ -1512,3 +1512,108 @@ footer {
         color: #333;
     }
 }
+
+
+/* Password Visibility Toggle */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.password-wrapper input {
+    width: 100%;
+    padding-right: 40px; /* Make room for the eye icon */
+}
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transform: none;
+    width: auto;
+    min-width: unset;
+}
+.toggle-password:active {
+    transform: none;
+    box-shadow: none;
+}
+.toggle-password:hover {
+    transform: none;
+    box-shadow: none;
+    opacity: 0.8;
+}
+
+
+/* Custom Modal & Button Loader */
+.custom-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+.custom-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+.custom-modal {
+    background: var(--bg-main);
+    border: 4px solid var(--border-main);
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 8px 8px 0 var(--border-main);
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+}
+.custom-modal-overlay.active .custom-modal {
+    transform: translateY(0);
+}
+.custom-modal p {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    font-family: 'Comic Neue', cursive;
+    color: var(--text-body);
+}
+.custom-modal button {
+    margin: 0 auto;
+}
+
+/* Button Loading State */
+button {
+    position: relative;
+    transition: all 0.2s ease;
+}
+button.loading {
+    color: transparent !important;
+    pointer-events: none;
+}
+button.loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1.2rem;
+    height: 1.2rem;
+    margin-top: -0.6rem;
+    margin-left: -0.6rem;
+    border: 3px solid rgba(0,0,0,0.2);
+    border-top-color: #000;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
