@@ -35,6 +35,7 @@ def seed_db():
             "2nde",
             "1ère",
             "Terminale",
+            "Étudiant",
             "Apprenti",
             "Autre",
         ]
