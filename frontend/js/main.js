@@ -441,7 +441,7 @@ ${a.logo_url ? `<img src="${a.logo_url}" alt="Logo" class="activity-card-logo">`
             
             <div class="detail-body">
                 <div class="quest-description-box">
-                    <p>${activity.description || 'Bienvenue dans cette quête !'}</p>
+                    <div>${activity.description || 'Bienvenue dans cette quête !'}</div>
                 </div>
                 
                 ${activity.video_url ? `<div class="video-section">${videoHtml}</div>` : ''}
@@ -602,7 +602,7 @@ ${a.logo_url ? `<img src="${a.logo_url}" alt="Logo" class="activity-card-logo">`
                                             </div>
                                             <div class="print-quest-desc">
                                                 <strong>📜 OBJECTIF :</strong>
-                                                <p>${t.activity ? (t.activity.description || 'Découvrir ce domaine.') : ''}</p>
+                                                <div>${t.activity ? (t.activity.description || 'Découvrir ce domaine.') : ''}</div>
                                             </div>
                                             <div class="print-quest-notes">
                                                 <strong>🖋️ MES NOTES D'AVENTURIER :</strong>
