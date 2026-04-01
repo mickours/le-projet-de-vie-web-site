@@ -363,6 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     ${a.role ? `<span class="badge badge-role">${a.role.label}</span>` : ''}
                                     ${a.level ? `<span class="badge badge-level">${a.level.label}</span>` : ''}
                                 </div>
+${a.logo_url ? `<img src="${a.logo_url}" alt="Logo" class="activity-card-logo">` : ""}
                                 <h3>${a.title}</h3>
                             </div>
                             <div class="activity-card-body">

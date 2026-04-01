@@ -52,6 +52,7 @@ class Activity(Base):
     title = Column(String(200), nullable=False)
     description = Column(Text)
     video_url = Column(String(500), nullable=True)
+    logo_url = Column(String(500), nullable=True)
     type_id = Column(Integer, ForeignKey("types.id"))
     theme_id = Column(Integer, ForeignKey("themes.id"))
     level_id = Column(Integer, ForeignKey("levels.id"))

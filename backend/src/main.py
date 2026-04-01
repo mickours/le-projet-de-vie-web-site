@@ -238,6 +238,7 @@ async def create_activity(
     type_id: int = Form(...),
     role_id: Optional[int] = Form(None),
     video_links: List[str] = Form([]),
+    logo: Optional[UploadFile] = File(None),
     files: List[UploadFile] = File([]),
     db: Session = Depends(get_db),
     admin: models.User = Depends(get_current_admin),
@@ -251,6 +252,15 @@ async def create_activity(
             status_code=400, detail="Maximum 10 resources allowed per quest"
         )
 
+
+    logo_url = None
+    if logo and logo.filename:
+        logo_filename = f"logo_{logo.filename}"
+        logo_location = os.path.join(uploads_path, logo_filename)
+        with open(logo_location, "wb") as f:
+            f.write(await logo.read())
+        logo_url = f"/uploads/{logo_filename}"
+
     db_activity = models.Activity(
         title=title,
         description=description,
@@ -258,6 +268,7 @@ async def create_activity(
         theme_id=theme_id,
         type_id=type_id,
         role_id=role_id,
+        logo_url=logo_url,
     )
     db.add(db_activity)
     db.commit()
@@ -326,6 +337,7 @@ async def update_activity(
     type_id: int = Form(...),
     role_id: Optional[int] = Form(None),
     video_links: List[str] = Form([]),
+    logo: Optional[UploadFile] = File(None),
     files: List[UploadFile] = File([]),
     db: Session = Depends(get_db),
     admin: models.User = Depends(get_current_admin),

@@ -110,6 +110,7 @@ class ActivityBase(BaseModel):
     title: str
     description: Optional[str] = None
     video_url: Optional[str] = None
+    logo_url: Optional[str] = None
     type_id: int
     theme_id: int
     level_id: int
