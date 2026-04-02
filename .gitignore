@@ -3,3 +3,4 @@ backend/monprojetdevie.db
 backend/src/monprojetdevie.db
 *__pycache__*
 backend/src/monprojetdevie.db
+frontend/node_modules

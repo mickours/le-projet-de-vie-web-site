@@ -170,6 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const switchView = (viewId, updateHistory = true) => {
         // Restrictions for guests
         if (!token && (viewId === 'dossier' || viewId === 'profile')) {
+            sessionStorage.setItem('redirectViewId', viewId);
             switchView('login');
             return;
         }
@@ -244,7 +245,6 @@ document.addEventListener('DOMContentLoaded', () => {
         currentRole.textContent = user.role ? user.role.label : 'Utilisateur';
         
         loadMetadata();
-        handleInitialRouting();
     };
 
     // --- Data Loading ---
@@ -763,7 +763,15 @@ ${a.logo_url ? `<img src="${a.logo_url}" alt="Logo" class="activity-card-logo">`
                 token = data.access_token;
                 localStorage.setItem('token', token);
                 const user = await (await apiFetch('/users/me')).json();
-                showApp(user);
+                const redirectViewId = sessionStorage.getItem('redirectViewId');
+                if (redirectViewId) {
+                    sessionStorage.removeItem('redirectViewId');
+                    showApp(user);
+                    switchView(redirectViewId);
+                } else {
+                    showApp(user);
+                    handleInitialRouting();
+                }
             } else {
                 alert('Identifiants incorrects.');
             }
@@ -844,7 +852,10 @@ ${a.logo_url ? `<img src="${a.logo_url}" alt="Logo" class="activity-card-logo">`
     if (token) {
         apiFetch('/users/me')
             .then(res => res.json())
-            .then(user => showApp(user))
+            .then(user => {
+                showApp(user);
+                handleInitialRouting();
+            })
             .catch(() => {
                 logout();
                 loadMetadata();
