@@ -693,6 +693,25 @@ ${a.logo_url ? `<img src="${a.logo_url}" alt="Logo" class="activity-card-logo">`
                     method: 'PUT',
                     body: JSON.stringify(updateData)
                 });
+
+                if (!res.ok) {
+                    const errorData = await res.json().catch(() => ({ detail: 'Une erreur de communication est survenue.' }));
+                    let errorMessage = 'La mise à jour du profil a échoué.';
+                    if (errorData && errorData.detail) {
+                        if (Array.isArray(errorData.detail)) {
+                            // Handle FastAPI/Pydantic validation errors
+                            errorMessage = errorData.detail.map(err => {
+                                const field = err.loc[err.loc.length - 1];
+                                return `- ${field}: ${err.msg}`;
+                            }).join('\n');
+                        } else {
+                            // Handle other string-based errors from the backend
+                            errorMessage = errorData.detail;
+                        }
+                    }
+                    throw new Error(errorMessage);
+                }
+
                 const data = await res.json();
                 currentUser = data.user;
                 
@@ -709,7 +728,8 @@ ${a.logo_url ? `<img src="${a.logo_url}" alt="Logo" class="activity-card-logo">`
                 alert('Profil mis à jour avec succès !');
                 // Refresh metadata to update default level filter and synchronize views
                 loadMetadata();
-                } catch (error) {                alert('Erreur lors de la mise à jour : ' + error.message);
+            } catch (error) {
+                alert('Erreur lors de la mise à jour :\n' + error.message);
             }
         });
     }

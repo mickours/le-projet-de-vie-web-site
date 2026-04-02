@@ -25,13 +25,16 @@ body {
     color: var(--text-main);
     line-height: 1.6;
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 main {
     max-width: 1200px;
     margin: 2rem auto;
-    padding: 0 2rem;
+    padding: 0 2rem 2rem;
     width: 100%;
+    flex: 1 0 auto;
 }
 
 @media (max-width: 600px) {
@@ -845,7 +848,6 @@ button:active {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    margin-bottom: 2.5rem;
     background: white;
     color: var(--text-main);
     border: 2px solid var(--border-main);
@@ -1222,8 +1224,6 @@ button:active {
 
 /* Footer */
 footer {
-    position: fixed;
-    bottom: 0;
     width: 100%;
     background: var(--border-main);
     color: white;
@@ -1567,7 +1567,7 @@ footer {
     visibility: visible;
 }
 .custom-modal {
-    background: var(--bg-main);
+    background: var(--bg-panel);
     border: 4px solid var(--border-main);
     border-radius: 12px;
     padding: 2rem;
@@ -1585,11 +1585,38 @@ footer {
     font-size: 1.2rem;
     margin-bottom: 1.5rem;
     font-family: 'Comic Neue', cursive;
-    color: var(--text-body);
+    color: var(--text-main);
 }
 .custom-modal button {
     margin: 0 auto;
 }
+
+.custom-modal .modal-input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 3px solid var(--border-main);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.custom-modal .modal-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.custom-modal .modal-buttons button {
+    margin: 0;
+    flex: 1;
+}
+
+.custom-modal .modal-buttons .modal-btn-cancel {
+    background-color: var(--bg-body);
+    color: var(--text-main);
+}
+
 
 /* Button Loading State */
 button {

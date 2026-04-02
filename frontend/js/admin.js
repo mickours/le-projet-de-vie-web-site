@@ -31,6 +31,89 @@ window.showModal = function(message) {
 
 window.alert = window.showModal;
 
+window.showConfirm = function(message) {
+    return new Promise((resolve) => {
+        let overlay = document.createElement("div");
+        overlay.className = "custom-modal-overlay";
+        overlay.innerHTML = `
+            <div class="custom-modal">
+                <p>${message}</p>
+                <div class="modal-buttons">
+                    <button id="modal-btn-confirm" class="approve-btn">Oui</button>
+                    <button id="modal-btn-cancel" class="reject-btn">Non</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        
+        overlay.offsetWidth;
+        overlay.classList.add("active");
+        
+        const confirmBtn = overlay.querySelector("#modal-btn-confirm");
+        const cancelBtn = overlay.querySelector("#modal-btn-cancel");
+
+        const close = (value) => {
+            overlay.classList.remove("active");
+            setTimeout(() => {
+                if (document.body.contains(overlay)) {
+                    document.body.removeChild(overlay);
+                }
+            }, 300);
+            resolve(value);
+        };
+
+        confirmBtn.addEventListener("click", () => close(true));
+        cancelBtn.addEventListener("click", () => close(false));
+    });
+};
+
+window.showPrompt = function(message, defaultValue = '') {
+    return new Promise((resolve) => {
+        let overlay = document.createElement("div");
+        overlay.className = "custom-modal-overlay";
+        overlay.innerHTML = `
+            <div class="custom-modal">
+                <p>${message}</p>
+                <input type="text" class="modal-input" value="${defaultValue}">
+                <div class="modal-buttons">
+                    <button id="modal-btn-confirm" class="approve-btn">OK</button>
+                    <button id="modal-btn-cancel" class="reject-btn">Annuler</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        
+        overlay.offsetWidth;
+        overlay.classList.add("active");
+
+        const confirmBtn = overlay.querySelector("#modal-btn-confirm");
+        const cancelBtn = overlay.querySelector("#modal-btn-cancel");
+        const input = overlay.querySelector(".modal-input");
+
+        input.focus();
+
+        const close = (value) => {
+            overlay.classList.remove("active");
+            setTimeout(() => {
+                if (document.body.contains(overlay)) {
+                    document.body.removeChild(overlay);
+                }
+            }, 300);
+            resolve(value);
+        };
+
+        confirmBtn.addEventListener("click", () => close(input.value));
+        cancelBtn.addEventListener("click", () => close(null));
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                close(input.value);
+            } else if (e.key === "Escape") {
+                close(null);
+            }
+        });
+    });
+};
+
 // Global Fetch Interceptor for Button Loaders
 const originalFetch = window.fetch;
 window.activeActionButton = null;
@@ -271,14 +354,14 @@ document.addEventListener('DOMContentLoaded', () => {
         loadAdminData();
     };
     window.deleteActivity = async (id) => {
-        if (confirm('Bannir cette quête de l\'aventure ?')) {
+        if (await window.showConfirm('Bannir cette quête de l\'aventure ?')) {
             await apiFetch(`/activities/${id}`, { method: 'DELETE' });
             loadAdminData();
         }
     };
 
     window.deleteDocument = async (docId, actId) => {
-        if (confirm('Voulez-vous vraiment supprimer cette ressource ?')) {
+        if (await window.showConfirm('Voulez-vous vraiment supprimer cette ressource ?')) {
             try {
                 const res = await apiFetch(`/documents/${docId}`, { method: 'DELETE' });
                 if (res.ok) {
@@ -348,14 +431,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.deleteUser = async (id) => {
-        if (confirm('Bannir cet aventurier définitivement ?')) {
+        if (await window.showConfirm('Bannir cet aventurier définitivement ?')) {
             await apiFetch(`/admin/users/${id}`, { method: 'DELETE' });
             loadAdminData();
         }
     };
 
     window.resetPassword = async (id) => {
-        const newPass = prompt("Entrez le nouveau mot de passe :");
+        const newPass = await window.showPrompt("Entrez le nouveau mot de passe :");
         if (newPass) {
             await apiFetch(`/admin/users/${id}/reset-password`, {
                 method: 'PUT',
