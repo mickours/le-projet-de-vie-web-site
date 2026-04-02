@@ -1641,4 +1641,3 @@ button.loading::after {
     to {transform: scale(1)}
 }
 
-.ql-toolbar { position: relative !important; z-index: 1001 !important; }
