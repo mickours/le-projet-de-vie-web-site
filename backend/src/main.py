@@ -374,6 +374,13 @@ async def update_activity(
     activity.type_id = type_id
     activity.role_id = role_id
 
+    if logo and logo.filename:
+        logo_filename = f"logo_{logo.filename}"
+        logo_location = os.path.join(uploads_path, logo_filename)
+        with open(logo_location, "wb") as f:
+            f.write(await logo.read())
+        activity.logo_url = f"/uploads/{logo_filename}"
+
     # Process Video Links
     for link in video_links:
         if not link.strip():
@@ -741,16 +748,20 @@ async def root():
     return {"message": "Landing page not found"}
 
 
-@app.get("/{full_path:path}")
-async def serve_frontend(full_path: str):
-    # If the path looks like a file or an internal path, let static mount/404 handle it
-    if "." in full_path or full_path.startswith(("uploads", "frontend")):
-        raise HTTPException(status_code=404)
-
+@app.get("/pages/adventure", include_in_schema=False)
+async def serve_adventure_home():
     adventure_path = os.path.join(frontend_path, "adventure.html")
     if os.path.exists(adventure_path):
         return FileResponse(adventure_path)
-    return {"message": "Adventure app file not found"}
+    raise HTTPException(status_code=404, detail="Adventure app file not found")
+
+
+@app.get("/pages/activities/{activity_id_or_path:path}", include_in_schema=False)
+async def serve_adventure_page(activity_id_or_path: str):
+    adventure_path = os.path.join(frontend_path, "adventure.html")
+    if os.path.exists(adventure_path):
+        return FileResponse(adventure_path)
+    raise HTTPException(status_code=404, detail="Adventure app file not found")
 
 
 if __name__ == "__main__":

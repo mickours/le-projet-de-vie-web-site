@@ -326,6 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
         adminActivitiesList.innerHTML = activities.map(a => `
             <div class="admin-list-item">
                 <div class="admin-list-item-info">
+                    ${a.logo_url ? `<img src="${a.logo_url}" alt="Logo" class="admin-list-logo">` : ''}
                     <strong>${a.title}</strong>
                     <div class="meta-badges">
                         ${a.level ? `<span>${a.level.label}</span>` : ''}
@@ -335,6 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
                 <div class="user-action-btns">
+                    <a href="/pages/activities/${a.id}" target="_blank" class="manage-btn" style="background: var(--accent-color); color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; text-decoration: none;">Voir l'Aventure</a>
                     <button class="manage-btn" onclick="editActivity(${a.id})" style="background: var(--primary-color); color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">Modifier</button>
                     <button class="delete-btn" onclick="deleteActivity(${a.id})">Supprimer</button>
                 </div>
@@ -424,6 +426,12 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('act-role').value = act.role_id || '';
             document.getElementById('act-theme').value = act.theme_id || '';
             document.getElementById('act-type').value = act.type_id || '';
+
+            const logoPreview = document.getElementById('logo-preview');
+            logoPreview.innerHTML = '';
+            if (act.logo_url) {
+                logoPreview.innerHTML = `<img src="${act.logo_url}" alt="Logo preview" style="max-width: 100px; max-height: 100px;">`;
+            }
             
             document.getElementById('form-act-title').textContent = "Modifier la quête";
             document.getElementById('submit-act-btn').textContent = "Mettre à jour la quête";
@@ -459,6 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (tinymce.get('tinymce-editor')) {
             tinymce.get('tinymce-editor').setContent('');
         }
+        document.getElementById('logo-preview').innerHTML = '';
         document.getElementById('form-act-title').textContent = "Ajouter une nouvelle quête";
         document.getElementById('submit-act-btn').textContent = "Sceller la quête";
         document.getElementById('cancel-edit-btn').classList.add('hidden');
@@ -592,7 +601,11 @@ document.addEventListener('DOMContentLoaded', () => {
             loadAdminData();
         } else {
             const err = await res.json();
-            alert('Erreur lors de l\'enregistrement : ' + (err.detail || 'Inconnue'));
+            let errorMessage = err.detail || 'Erreur Inconnue';
+            if (Array.isArray(errorMessage)) {
+                errorMessage = errorMessage.map(e => `${e.loc.join(' > ')}: ${e.msg}`).join('\n');
+            }
+            alert('Erreur lors de l\'enregistrement : \n' + errorMessage);
         }
     });
 

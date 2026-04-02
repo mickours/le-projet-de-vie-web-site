@@ -82,7 +82,7 @@
                             <input type="hidden" id="act-id">
                             <div class="form-group">
                                 <label for="act-title">Titre de la quête</label>
-                                <input type="text" id="act-title" placeholder="Ex: Découvrir les métiers du web" required>
+                                <input type="text" id="act-title" name="title" placeholder="Ex: Découvrir les métiers du web" required>
                             </div>
                             
                                                         <div class="form-group">
@@ -91,22 +91,28 @@
                                 <input type="hidden" id="act-desc" name="description">
                             </div>
 
+                            <div class="form-group">
+                                <label for="act-logo">Logo de la quête</label>
+                                <input type="file" id="act-logo" name="logo" accept="image/*">
+                                <div id="logo-preview" class="mt-1"></div>
+                            </div>
+
                             <div class="form-grid-profile">
                                 <div class="form-group">
                                     <label for="act-level">Niveau scolaire</label>
-                                    <select id="act-level" required></select>
+                                    <select id="act-level" name="level_id" required></select>
                                 </div>
                                 <div class="form-group">
                                     <label for="act-role">Rôle concerné</label>
-                                    <select id="act-role" required></select>
+                                    <select id="act-role" name="role_id" required></select>
                                 </div>
                                 <div class="form-group">
                                     <label for="act-theme">Thématique</label>
-                                    <select id="act-theme" required></select>
+                                    <select id="act-theme" name="theme_id" required></select>
                                 </div>
                                 <div class="form-group">
                                     <label for="act-type">Type d'activité</label>
-                                    <select id="act-type" required></select>
+                                    <select id="act-type" name="type_id" required></select>
                                 </div>
                             </div>
 

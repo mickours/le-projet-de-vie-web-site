@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (viewId === 'profile') loadProfile();
 
         if (updateHistory) {
-            const url = viewId === 'home' ? '/adventure' : `/${viewId}`;
+            const url = viewId === 'home' ? '/' : `/pages/adventure/${viewId}`;
             history.pushState({ viewId }, '', url);
         }
     };
@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const handleInitialRouting = () => {
         const path = window.location.pathname;
-        if (path.startsWith('/activities/')) {
+        if (path.startsWith('/pages/activities/')) {
             const id = path.split('/').pop();
             if (id && !isNaN(id)) {
                 showActivityDetail(id, false);
@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        const view = path.replace('/adventure', '').replace(/\//g, '') || 'home';
+        const view = path.replace('/pages/adventure', '').replace(/\//g, '') || 'home';
         const validViews = ['home', 'activities', 'dossier', 'profile', 'login'];
         switchView(validViews.includes(view) ? view : 'home', false);
     };
@@ -398,7 +398,7 @@ ${a.logo_url ? `<img src="${a.logo_url}" alt="Logo" class="activity-card-logo">`
     const showActivityDetail = async (id, updateHistory = true) => {
         currentActivityId = id;
         if (updateHistory) {
-            history.pushState({ viewId: 'activity-detail', activityId: id }, '', `/activities/${id}`);
+            history.pushState({ viewId: 'activity-detail', activityId: id }, '', `/pages/activities/${id}`);
         }
         const activity = await (await apiFetch(`/activities/${id}`)).json();
         
@@ -478,7 +478,7 @@ ${a.logo_url ? `<img src="${a.logo_url}" alt="Logo" class="activity-card-logo">`
         }
 
         loadComments(id);
-        switchView('activity-detail');
+        switchView('activity-detail', false);
     };
 
     const loadComments = async (id) => {
