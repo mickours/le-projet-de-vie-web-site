@@ -336,8 +336,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
                 <div class="user-action-btns">
-                    <a href="/pages/activities/${a.id}" target="_blank" class="manage-btn" style="background: var(--accent-color); color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; text-decoration: none;">Voir l'Aventure</a>
-                    <button class="manage-btn" onclick="editActivity(${a.id})" style="background: var(--primary-color); color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">Modifier</button>
+                    <button class="manage-btn" style="background: var(--accent-color);">
+                        <a href="/pages/activities/${a.id}" target="_blank" style="color: white; text-decoration: none;">Voir l'Aventure</a>
+                    </button>
+                    <button class="manage-btn" onclick="editActivity(${a.id})" style="background: var(--primary-color); color: white;">Modifier</button>
                     <button class="delete-btn" onclick="deleteActivity(${a.id})">Supprimer</button>
                 </div>
             </div>
