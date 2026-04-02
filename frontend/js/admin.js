@@ -3,7 +3,7 @@
 window.showModal = function(message) {
     return new Promise((resolve) => {
         let overlay = document.createElement("div");
-        overlay.className = "custom-modal-overlay";
+        overlay.className = "gemini-modal-overlay-force-style";
         overlay.innerHTML = `
             <div class="custom-modal">
                 <p>${message}</p>
@@ -11,20 +11,26 @@ window.showModal = function(message) {
             </div>
         `;
         document.body.appendChild(overlay);
-        
-        // Trigger reflow
-        overlay.offsetWidth;
-        overlay.classList.add("active");
+
+        // Show the modal
+        overlay.style.display = 'block';
         
         const btn = overlay.querySelector("button");
-        btn.addEventListener("click", () => {
-            overlay.classList.remove("active");
-            setTimeout(() => {
-                if (document.body.contains(overlay)) {
-                    document.body.removeChild(overlay);
-                }
-            }, 300);
+        const closeModal = () => {
+            overlay.style.display = 'none';
+            if (document.body.contains(overlay)) {
+                document.body.removeChild(overlay);
+            }
             resolve();
+        };
+
+        btn.addEventListener("click", closeModal);
+        
+        // Also close if user clicks outside the modal content
+        overlay.addEventListener('click', (event) => {
+            if (event.target === overlay) {
+                closeModal();
+            }
         });
     });
 };
@@ -34,7 +40,7 @@ window.alert = window.showModal;
 window.showConfirm = function(message) {
     return new Promise((resolve) => {
         let overlay = document.createElement("div");
-        overlay.className = "custom-modal-overlay";
+        overlay.className = "gemini-modal-overlay-force-style";
         overlay.innerHTML = `
             <div class="custom-modal">
                 <p>${message}</p>
@@ -45,20 +51,17 @@ window.showConfirm = function(message) {
             </div>
         `;
         document.body.appendChild(overlay);
-        
-        overlay.offsetWidth;
-        overlay.classList.add("active");
-        
+
+        overlay.style.display = 'block';
+
         const confirmBtn = overlay.querySelector("#modal-btn-confirm");
         const cancelBtn = overlay.querySelector("#modal-btn-cancel");
 
         const close = (value) => {
-            overlay.classList.remove("active");
-            setTimeout(() => {
-                if (document.body.contains(overlay)) {
-                    document.body.removeChild(overlay);
-                }
-            }, 300);
+            overlay.style.display = 'none';
+            if (document.body.contains(overlay)) {
+                document.body.removeChild(overlay);
+            }
             resolve(value);
         };
 
@@ -70,7 +73,7 @@ window.showConfirm = function(message) {
 window.showPrompt = function(message, defaultValue = '') {
     return new Promise((resolve) => {
         let overlay = document.createElement("div");
-        overlay.className = "custom-modal-overlay";
+        overlay.className = "gemini-modal-overlay-force-style";
         overlay.innerHTML = `
             <div class="custom-modal">
                 <p>${message}</p>
@@ -82,9 +85,8 @@ window.showPrompt = function(message, defaultValue = '') {
             </div>
         `;
         document.body.appendChild(overlay);
-        
-        overlay.offsetWidth;
-        overlay.classList.add("active");
+
+        overlay.style.display = 'block';
 
         const confirmBtn = overlay.querySelector("#modal-btn-confirm");
         const cancelBtn = overlay.querySelector("#modal-btn-cancel");
@@ -93,12 +95,10 @@ window.showPrompt = function(message, defaultValue = '') {
         input.focus();
 
         const close = (value) => {
-            overlay.classList.remove("active");
-            setTimeout(() => {
-                if (document.body.contains(overlay)) {
-                    document.body.removeChild(overlay);
-                }
-            }, 300);
+            overlay.style.display = 'none';
+            if (document.body.contains(overlay)) {
+                document.body.removeChild(overlay);
+            }
             resolve(value);
         };
 
@@ -232,8 +232,47 @@ document.addEventListener('DOMContentLoaded', () => {
         adminSection.classList.remove('hidden');
         userControls.classList.remove('hidden');
         usernameDisplay.textContent = user.username + " (Maître)";
+        
+        // Initialize TinyMCE Editor
+        initializeTinyMCE();
+        
         await loadMetadata();
         await loadAdminData();
+    };
+
+    const initializeTinyMCE = async () => {
+        try {
+            const config = await (await fetch('/api/config')).json();
+            const apiKey = config.tinymce_api_key || 'no-api-key';
+
+            // Check if TinyMCE is already loaded
+            if (window.tinymce) {
+                tinymce.init({
+                    selector: '#tinymce-editor',
+                    plugins: 'paste image link lists',
+                    toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | link image',
+                    paste_data_images: true,
+                    height: 350,
+                });
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = `https://cdn.tiny.cloud/1/${apiKey}/tinymce/7/tinymce.min.js`;
+            script.referrerPolicy = 'origin';
+            script.onload = () => {
+                tinymce.init({
+                    selector: '#tinymce-editor',
+                    plugins: 'paste image link lists',
+                    toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | link image',
+                    paste_data_images: true,
+                    height: 350,
+                });
+            };
+            document.head.appendChild(script);
+        } catch (error) {
+            console.error('Failed to initialize TinyMCE:', error);
+        }
     };
 
     // --- Menu Toggle ---
@@ -380,7 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const act = await (await apiFetch(`/activities/${id}`)).json();
             document.getElementById('act-id').value = act.id;
             document.getElementById('act-title').value = act.title || '';
-            document.getElementById('act-desc').value = act.description || '';
+            tinymce.get('tinymce-editor').setContent(act.description || ''); // Set editor content
             document.getElementById('act-level').value = act.level_id || '';
             document.getElementById('act-role').value = act.role_id || '';
             document.getElementById('act-theme').value = act.theme_id || '';
@@ -417,6 +456,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const resetActivityForm = () => {
         addActivityForm.reset();
         document.getElementById('act-id').value = '';
+        if (tinymce.get('tinymce-editor')) {
+            tinymce.get('tinymce-editor').setContent('');
+        }
         document.getElementById('form-act-title').textContent = "Ajouter une nouvelle quête";
         document.getElementById('submit-act-btn').textContent = "Sceller la quête";
         document.getElementById('cancel-edit-btn').classList.add('hidden');
@@ -514,14 +556,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     addActivityForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        
+        // Get content from TinyMCE and put it in the hidden input
+        const description = tinymce.get('tinymce-editor').getContent();
+        document.getElementById('act-desc').value = description;
+        
         const actId = document.getElementById('act-id').value;
-        const formData = new FormData();
-        formData.append('title', document.getElementById('act-title').value);
-        formData.append('description', document.getElementById('act-desc').value);
-        formData.append('level_id', document.getElementById('act-level').value);
-        formData.append('role_id', document.getElementById('act-role').value);
-        formData.append('theme_id', document.getElementById('act-theme').value);
-        formData.append('type_id', document.getElementById('act-type').value);
+        const formData = new FormData(addActivityForm);
+        // The description is already in formData from the hidden input
         
         // Collect new dynamic resources (works for both creation and update)
         const resourceRows = document.querySelectorAll('.resource-row');

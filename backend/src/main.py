@@ -8,7 +8,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session, joinedload
 
-from database import engine, get_db
+from database import get_db
 from config import settings
 import models
 import schemas
@@ -50,6 +50,17 @@ app.mount("/uploads", StaticFiles(directory=uploads_path), name="uploads")
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     return FileResponse(os.path.join(frontend_path, "favicon.svg"))
+
+
+# --- Config ---
+
+
+@app.get("/api/config", response_model=schemas.Config, tags=["Config"])
+async def get_app_config():
+    """
+    Expose public configurations
+    """
+    return {"tinymce_api_key": settings.TINYMCE_API_KEY}
 
 
 # --- Authentication ---
@@ -252,7 +263,6 @@ async def create_activity(
             status_code=400, detail="Maximum 10 resources allowed per quest"
         )
 
-
     logo_url = None
     if logo and logo.filename:
         logo_filename = f"logo_{logo.filename}"
@@ -413,7 +423,7 @@ async def delete_document(
     )
     if not document:
         raise HTTPException(status_code=404, detail="Document not found")
-    
+
     # Optionally delete the file from disk if it's a file
     if document.doc_type in ["pdf", "video_file"]:
         filename = os.path.basename(document.url)

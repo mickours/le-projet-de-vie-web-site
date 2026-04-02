@@ -49,7 +49,12 @@ def seed_db():
     # Themes
     themes = [
         models.Theme(label=label)
-        for label in ["Métiers", "Formations", "Connaissance de Soi", "Projet Personnel"]
+        for label in [
+            "Métiers",
+            "Formations",
+            "Connaissance de Soi",
+            "Projet Personnel",
+        ]
     ]
     db.add_all(themes)
 

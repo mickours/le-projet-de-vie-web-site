@@ -41,6 +41,12 @@ in
       description = "Path to a file containing the SECRET_KEY.";
     };
 
+    tinymceApiKeyFile = mkOption {
+      type = types.nullOr types.path;
+      default = null;
+      description = "Path to a file containing the TINYMCE_API_KEY.";
+    };
+
     allowedOrigins = mkOption {
       type = types.listOf types.str;
       default = [ "*" ];
@@ -111,7 +117,13 @@ in
           "${pythonEnv}/bin/python seed.py"
         ];
 
-        EnvironmentFile = mkIf (cfg.secretKeyFile != null) cfg.secretKeyFile;
+        EnvironmentFile = let
+          envFiles = [
+            (mkIf (cfg.secretKeyFile != null) cfg.secretKeyFile)
+            (mkIf (cfg.tinymceApiKeyFile != null) cfg.tinymceApiKeyFile)
+          ];
+        in lib.filter (x: x != null) envFiles;
+
         User = "mon-projet-de-vie";
         Group = "mon-projet-de-vie";
         Restart = "always";

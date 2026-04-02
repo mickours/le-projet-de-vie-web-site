@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     # CORS Settings
     ALLOWED_ORIGINS: List[str] = ["*"]
 
+    # TinyMCE API Key
+    TINYMCE_API_KEY: str = "no-api-key"
+
     # Environment Configuration
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", case_sensitive=True

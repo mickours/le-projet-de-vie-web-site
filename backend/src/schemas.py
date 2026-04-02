@@ -162,3 +162,8 @@ class Comment(CommentBase):
     is_moderated: bool
     created_at: datetime
     username: Optional[str] = None
+
+
+# --- Config Schemas ---
+class Config(BaseModel):
+    tinymce_api_key: str

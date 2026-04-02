@@ -1,10 +1,11 @@
 """Initial migration with themes update
 
 Revision ID: ac1c81fd8e25
-Revises: 
+Revises:
 Create Date: 2026-04-01 14:56:33.767748
 
 """
+
 from typing import Sequence, Union
 
 from alembic import op
@@ -12,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'ac1c81fd8e25'
+revision: str = "ac1c81fd8e25"
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -27,170 +28,224 @@ def upgrade() -> None:
     tables = inspector.get_table_names()
 
     if "users" not in tables:
-
-        op.create_table('levels',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('label', sa.String(length=50), nullable=False),
-        sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('label')
+        op.create_table(
+            "levels",
+            sa.Column("id", sa.Integer(), nullable=False),
+            sa.Column("label", sa.String(length=50), nullable=False),
+            sa.PrimaryKeyConstraint("id"),
+            sa.UniqueConstraint("label"),
         )
-        with op.batch_alter_table('levels', schema=None) as batch_op:
-            batch_op.create_index(batch_op.f('ix_levels_id'), ['id'], unique=False)
+        with op.batch_alter_table("levels", schema=None) as batch_op:
+            batch_op.create_index(batch_op.f("ix_levels_id"), ["id"], unique=False)
 
-        op.create_table('roles',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('label', sa.String(length=50), nullable=False),
-        sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('label')
+        op.create_table(
+            "roles",
+            sa.Column("id", sa.Integer(), nullable=False),
+            sa.Column("label", sa.String(length=50), nullable=False),
+            sa.PrimaryKeyConstraint("id"),
+            sa.UniqueConstraint("label"),
         )
-        with op.batch_alter_table('roles', schema=None) as batch_op:
-            batch_op.create_index(batch_op.f('ix_roles_id'), ['id'], unique=False)
+        with op.batch_alter_table("roles", schema=None) as batch_op:
+            batch_op.create_index(batch_op.f("ix_roles_id"), ["id"], unique=False)
 
-        op.create_table('themes',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('label', sa.String(length=100), nullable=False),
-        sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('label')
+        op.create_table(
+            "themes",
+            sa.Column("id", sa.Integer(), nullable=False),
+            sa.Column("label", sa.String(length=100), nullable=False),
+            sa.PrimaryKeyConstraint("id"),
+            sa.UniqueConstraint("label"),
         )
-        with op.batch_alter_table('themes', schema=None) as batch_op:
-            batch_op.create_index(batch_op.f('ix_themes_id'), ['id'], unique=False)
+        with op.batch_alter_table("themes", schema=None) as batch_op:
+            batch_op.create_index(batch_op.f("ix_themes_id"), ["id"], unique=False)
 
-        op.create_table('types',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('label', sa.String(length=100), nullable=False),
-        sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('label')
+        op.create_table(
+            "types",
+            sa.Column("id", sa.Integer(), nullable=False),
+            sa.Column("label", sa.String(length=100), nullable=False),
+            sa.PrimaryKeyConstraint("id"),
+            sa.UniqueConstraint("label"),
         )
-        with op.batch_alter_table('types', schema=None) as batch_op:
-            batch_op.create_index(batch_op.f('ix_types_id'), ['id'], unique=False)
+        with op.batch_alter_table("types", schema=None) as batch_op:
+            batch_op.create_index(batch_op.f("ix_types_id"), ["id"], unique=False)
 
-        op.create_table('activities',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('title', sa.String(length=200), nullable=False),
-        sa.Column('description', sa.Text(), nullable=True),
-        sa.Column('video_url', sa.String(length=500), nullable=True),
-        sa.Column('type_id', sa.Integer(), nullable=True),
-        sa.Column('theme_id', sa.Integer(), nullable=True),
-        sa.Column('level_id', sa.Integer(), nullable=True),
-        sa.Column('role_id', sa.Integer(), nullable=True),
-        sa.ForeignKeyConstraint(['level_id'], ['levels.id'], ),
-        sa.ForeignKeyConstraint(['role_id'], ['roles.id'], ),
-        sa.ForeignKeyConstraint(['theme_id'], ['themes.id'], ),
-        sa.ForeignKeyConstraint(['type_id'], ['types.id'], ),
-        sa.PrimaryKeyConstraint('id')
+        op.create_table(
+            "activities",
+            sa.Column("id", sa.Integer(), nullable=False),
+            sa.Column("title", sa.String(length=200), nullable=False),
+            sa.Column("description", sa.Text(), nullable=True),
+            sa.Column("video_url", sa.String(length=500), nullable=True),
+            sa.Column("type_id", sa.Integer(), nullable=True),
+            sa.Column("theme_id", sa.Integer(), nullable=True),
+            sa.Column("level_id", sa.Integer(), nullable=True),
+            sa.Column("role_id", sa.Integer(), nullable=True),
+            sa.ForeignKeyConstraint(
+                ["level_id"],
+                ["levels.id"],
+            ),
+            sa.ForeignKeyConstraint(
+                ["role_id"],
+                ["roles.id"],
+            ),
+            sa.ForeignKeyConstraint(
+                ["theme_id"],
+                ["themes.id"],
+            ),
+            sa.ForeignKeyConstraint(
+                ["type_id"],
+                ["types.id"],
+            ),
+            sa.PrimaryKeyConstraint("id"),
         )
-        with op.batch_alter_table('activities', schema=None) as batch_op:
-            batch_op.create_index(batch_op.f('ix_activities_id'), ['id'], unique=False)
+        with op.batch_alter_table("activities", schema=None) as batch_op:
+            batch_op.create_index(batch_op.f("ix_activities_id"), ["id"], unique=False)
 
-        op.create_table('users',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('username', sa.String(length=100), nullable=False),
-        sa.Column('password_hash', sa.String(length=255), nullable=False),
-        sa.Column('avatar', sa.String(length=50), nullable=True),
-        sa.Column('age', sa.Integer(), nullable=True),
-        sa.Column('role_id', sa.Integer(), nullable=True),
-        sa.Column('level_id', sa.Integer(), nullable=True),
-        sa.ForeignKeyConstraint(['level_id'], ['levels.id'], ),
-        sa.ForeignKeyConstraint(['role_id'], ['roles.id'], ),
-        sa.PrimaryKeyConstraint('id')
+        op.create_table(
+            "users",
+            sa.Column("id", sa.Integer(), nullable=False),
+            sa.Column("username", sa.String(length=100), nullable=False),
+            sa.Column("password_hash", sa.String(length=255), nullable=False),
+            sa.Column("avatar", sa.String(length=50), nullable=True),
+            sa.Column("age", sa.Integer(), nullable=True),
+            sa.Column("role_id", sa.Integer(), nullable=True),
+            sa.Column("level_id", sa.Integer(), nullable=True),
+            sa.ForeignKeyConstraint(
+                ["level_id"],
+                ["levels.id"],
+            ),
+            sa.ForeignKeyConstraint(
+                ["role_id"],
+                ["roles.id"],
+            ),
+            sa.PrimaryKeyConstraint("id"),
         )
-        with op.batch_alter_table('users', schema=None) as batch_op:
-            batch_op.create_index(batch_op.f('ix_users_id'), ['id'], unique=False)
-            batch_op.create_index(batch_op.f('ix_users_username'), ['username'], unique=True)
+        with op.batch_alter_table("users", schema=None) as batch_op:
+            batch_op.create_index(batch_op.f("ix_users_id"), ["id"], unique=False)
+            batch_op.create_index(
+                batch_op.f("ix_users_username"), ["username"], unique=True
+            )
 
-        op.create_table('comments',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('activity_id', sa.Integer(), nullable=True),
-        sa.Column('user_id', sa.Integer(), nullable=True),
-        sa.Column('content', sa.Text(), nullable=False),
-        sa.Column('is_moderated', sa.Boolean(), nullable=True),
-        sa.Column('created_at', sa.DateTime(), nullable=True),
-        sa.ForeignKeyConstraint(['activity_id'], ['activities.id'], ),
-        sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-        sa.PrimaryKeyConstraint('id')
+        op.create_table(
+            "comments",
+            sa.Column("id", sa.Integer(), nullable=False),
+            sa.Column("activity_id", sa.Integer(), nullable=True),
+            sa.Column("user_id", sa.Integer(), nullable=True),
+            sa.Column("content", sa.Text(), nullable=False),
+            sa.Column("is_moderated", sa.Boolean(), nullable=True),
+            sa.Column("created_at", sa.DateTime(), nullable=True),
+            sa.ForeignKeyConstraint(
+                ["activity_id"],
+                ["activities.id"],
+            ),
+            sa.ForeignKeyConstraint(
+                ["user_id"],
+                ["users.id"],
+            ),
+            sa.PrimaryKeyConstraint("id"),
         )
-        with op.batch_alter_table('comments', schema=None) as batch_op:
-            batch_op.create_index(batch_op.f('ix_comments_id'), ['id'], unique=False)
+        with op.batch_alter_table("comments", schema=None) as batch_op:
+            batch_op.create_index(batch_op.f("ix_comments_id"), ["id"], unique=False)
 
-        op.create_table('documents',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('filename', sa.String(length=255), nullable=False),
-        sa.Column('url', sa.String(length=500), nullable=False),
-        sa.Column('doc_type', sa.String(length=20), nullable=True),
-        sa.Column('activity_id', sa.Integer(), nullable=True),
-        sa.ForeignKeyConstraint(['activity_id'], ['activities.id'], ),
-        sa.PrimaryKeyConstraint('id')
+        op.create_table(
+            "documents",
+            sa.Column("id", sa.Integer(), nullable=False),
+            sa.Column("filename", sa.String(length=255), nullable=False),
+            sa.Column("url", sa.String(length=500), nullable=False),
+            sa.Column("doc_type", sa.String(length=20), nullable=True),
+            sa.Column("activity_id", sa.Integer(), nullable=True),
+            sa.ForeignKeyConstraint(
+                ["activity_id"],
+                ["activities.id"],
+            ),
+            sa.PrimaryKeyConstraint("id"),
         )
-        with op.batch_alter_table('documents', schema=None) as batch_op:
-            batch_op.create_index(batch_op.f('ix_documents_id'), ['id'], unique=False)
+        with op.batch_alter_table("documents", schema=None) as batch_op:
+            batch_op.create_index(batch_op.f("ix_documents_id"), ["id"], unique=False)
 
-        op.create_table('user_activities',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('user_id', sa.Integer(), nullable=True),
-        sa.Column('activity_id', sa.Integer(), nullable=True),
-        sa.Column('is_completed', sa.Boolean(), nullable=True),
-        sa.Column('notes', sa.Text(), nullable=True),
-        sa.ForeignKeyConstraint(['activity_id'], ['activities.id'], ),
-        sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-        sa.PrimaryKeyConstraint('id')
+        op.create_table(
+            "user_activities",
+            sa.Column("id", sa.Integer(), nullable=False),
+            sa.Column("user_id", sa.Integer(), nullable=True),
+            sa.Column("activity_id", sa.Integer(), nullable=True),
+            sa.Column("is_completed", sa.Boolean(), nullable=True),
+            sa.Column("notes", sa.Text(), nullable=True),
+            sa.ForeignKeyConstraint(
+                ["activity_id"],
+                ["activities.id"],
+            ),
+            sa.ForeignKeyConstraint(
+                ["user_id"],
+                ["users.id"],
+            ),
+            sa.PrimaryKeyConstraint("id"),
         )
-        with op.batch_alter_table('user_activities', schema=None) as batch_op:
-            batch_op.create_index(batch_op.f('ix_user_activities_id'), ['id'], unique=False)
+        with op.batch_alter_table("user_activities", schema=None) as batch_op:
+            batch_op.create_index(
+                batch_op.f("ix_user_activities_id"), ["id"], unique=False
+            )
 
-        op.create_table('user_relationships',
-        sa.Column('parent_id', sa.Integer(), nullable=False),
-        sa.Column('child_id', sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(['child_id'], ['users.id'], ),
-        sa.ForeignKeyConstraint(['parent_id'], ['users.id'], ),
-        sa.PrimaryKeyConstraint('parent_id', 'child_id')
+        op.create_table(
+            "user_relationships",
+            sa.Column("parent_id", sa.Integer(), nullable=False),
+            sa.Column("child_id", sa.Integer(), nullable=False),
+            sa.ForeignKeyConstraint(
+                ["child_id"],
+                ["users.id"],
+            ),
+            sa.ForeignKeyConstraint(
+                ["parent_id"],
+                ["users.id"],
+            ),
+            sa.PrimaryKeyConstraint("parent_id", "child_id"),
         )
     # ### end Alembic commands ###
-    op.execute("UPDATE themes SET label = 'Connaissance de Soi' WHERE label = 'Compétences'")
+    op.execute(
+        "UPDATE themes SET label = 'Connaissance de Soi' WHERE label = 'Compétences'"
+    )
 
 
 def downgrade() -> None:
     """Downgrade schema."""
     # ### commands auto generated by Alembic - please adjust! ###
 
+    op.drop_table("user_relationships")
+    with op.batch_alter_table("user_activities", schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f("ix_user_activities_id"))
 
+    op.drop_table("user_activities")
+    with op.batch_alter_table("documents", schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f("ix_documents_id"))
 
-    op.drop_table('user_relationships')
-    with op.batch_alter_table('user_activities', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_user_activities_id'))
+    op.drop_table("documents")
+    with op.batch_alter_table("comments", schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f("ix_comments_id"))
 
-    op.drop_table('user_activities')
-    with op.batch_alter_table('documents', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_documents_id'))
+    op.drop_table("comments")
+    with op.batch_alter_table("users", schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f("ix_users_username"))
+        batch_op.drop_index(batch_op.f("ix_users_id"))
 
-    op.drop_table('documents')
-    with op.batch_alter_table('comments', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_comments_id'))
+    op.drop_table("users")
+    with op.batch_alter_table("activities", schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f("ix_activities_id"))
 
-    op.drop_table('comments')
-    with op.batch_alter_table('users', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_users_username'))
-        batch_op.drop_index(batch_op.f('ix_users_id'))
+    op.drop_table("activities")
+    with op.batch_alter_table("types", schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f("ix_types_id"))
 
-    op.drop_table('users')
-    with op.batch_alter_table('activities', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_activities_id'))
+    op.drop_table("types")
+    with op.batch_alter_table("themes", schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f("ix_themes_id"))
 
-    op.drop_table('activities')
-    with op.batch_alter_table('types', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_types_id'))
+    op.drop_table("themes")
+    with op.batch_alter_table("roles", schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f("ix_roles_id"))
 
-    op.drop_table('types')
-    with op.batch_alter_table('themes', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_themes_id'))
+    op.drop_table("roles")
+    with op.batch_alter_table("levels", schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f("ix_levels_id"))
 
-    op.drop_table('themes')
-    with op.batch_alter_table('roles', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_roles_id'))
-
-    op.drop_table('roles')
-    with op.batch_alter_table('levels', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_levels_id'))
-
-    op.drop_table('levels')
+    op.drop_table("levels")
     # ### end Alembic commands ###
-    op.execute("UPDATE themes SET label = 'Compétences' WHERE label = 'Connaissance de Soi'")
+    op.execute(
+        "UPDATE themes SET label = 'Compétences' WHERE label = 'Connaissance de Soi'"
+    )

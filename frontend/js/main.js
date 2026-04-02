@@ -3,7 +3,7 @@
 window.showModal = function(message) {
     return new Promise((resolve) => {
         let overlay = document.createElement("div");
-        overlay.className = "custom-modal-overlay";
+        overlay.className = "gemini-modal-overlay-force-style";
         overlay.innerHTML = `
             <div class="custom-modal">
                 <p>${message}</p>
@@ -11,20 +11,26 @@ window.showModal = function(message) {
             </div>
         `;
         document.body.appendChild(overlay);
-        
-        // Trigger reflow
-        overlay.offsetWidth;
-        overlay.classList.add("active");
+
+        // Show the modal
+        overlay.style.display = 'block';
         
         const btn = overlay.querySelector("button");
-        btn.addEventListener("click", () => {
-            overlay.classList.remove("active");
-            setTimeout(() => {
-                if (document.body.contains(overlay)) {
-                    document.body.removeChild(overlay);
-                }
-            }, 300);
+        const closeModal = () => {
+            overlay.style.display = 'none';
+            if (document.body.contains(overlay)) {
+                document.body.removeChild(overlay);
+            }
             resolve();
+        };
+
+        btn.addEventListener("click", closeModal);
+        
+        // Also close if user clicks outside the modal content
+        overlay.addEventListener('click', (event) => {
+            if (event.target === overlay) {
+                closeModal();
+            }
         });
     });
 };

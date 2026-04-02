@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administration - L'aventure de l'Orientation</title>
     <link rel="icon" type="image/svg+xml" href="/frontend/favicon.svg">
-    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
     <link rel="stylesheet" href="/frontend/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
 </head>
@@ -88,8 +87,8 @@
                             
                                                         <div class="form-group">
                                 <label for="act-desc">Description</label>
-                                <div id="quill-editor" style="height: 200px; background: white; border-radius: 0 0 8px 8px; border: 3px solid var(--border-main); border-top: none;"></div>
-                                <input type="hidden" id="act-desc">
+                                <textarea id="tinymce-editor"></textarea>
+                                <input type="hidden" id="act-desc" name="description">
                             </div>
 
                             <div class="form-grid-profile">
@@ -202,7 +201,6 @@
         <p>&copy; 2026 Administration - L'aventure de l'Orientation</p>
     </footer>
 
-    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
     <script src="/frontend/js/admin.js"></script>
 </body>
 </html>

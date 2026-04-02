@@ -12,6 +12,37 @@
     --border-main: black;
 }
 
+.gemini-modal-overlay-force-style {
+  z-index: 9999 !important;
+  display: none;
+  padding-top: 100px !important;
+  position: fixed !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: auto !important;
+  background-color: rgba(0,0,0,0.8) !important;
+}
+
+.gemini-modal-overlay-force-style .custom-modal {
+    background-color: var(--bg-panel);
+    margin: 5% auto 15% auto;
+    border: 4px solid var(--border-main);
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 8px 8px 0 var(--border-main);
+    animation: animatezoom 0.6s;
+}
+
+@keyframes animatezoom {
+    from {transform: scale(0)} 
+    to {transform: scale(1)}
+}
+
 /* Reset and basic styles */
 * {
     box-sizing: border-box;
@@ -983,7 +1014,7 @@ button:active {
 
 .admin-split {
     display: grid;
-    grid-template-columns: 1fr 1.2fr;
+    grid-template-columns: 1.5fr 1fr;
     gap: 4rem;
     align-items: start;
     margin-top: 2rem;
@@ -1549,75 +1580,6 @@ footer {
 }
 
 
-/* Custom Modal & Button Loader */
-.custom-modal-overlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10000;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-}
-.custom-modal-overlay.active {
-    opacity: 1;
-    visibility: visible;
-}
-.custom-modal {
-    background: var(--bg-panel);
-    border: 4px solid var(--border-main);
-    border-radius: 12px;
-    padding: 2rem;
-    max-width: 400px;
-    width: 90%;
-    text-align: center;
-    box-shadow: 8px 8px 0 var(--border-main);
-    transform: translateY(-20px);
-    transition: transform 0.3s ease;
-}
-.custom-modal-overlay.active .custom-modal {
-    transform: translateY(0);
-}
-.custom-modal p {
-    font-size: 1.2rem;
-    margin-bottom: 1.5rem;
-    font-family: 'Comic Neue', cursive;
-    color: var(--text-main);
-}
-.custom-modal button {
-    margin: 0 auto;
-}
-
-.custom-modal .modal-input {
-    width: 100%;
-    padding: 0.8rem;
-    border: 3px solid var(--border-main);
-    border-radius: 8px;
-    font-family: inherit;
-    font-size: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.custom-modal .modal-buttons {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-}
-
-.custom-modal .modal-buttons button {
-    margin: 0;
-    flex: 1;
-}
-
-.custom-modal .modal-buttons .modal-btn-cancel {
-    background-color: var(--bg-body);
-    color: var(--text-main);
-}
-
-
 /* Button Loading State */
 button {
     position: relative;
@@ -1646,3 +1608,37 @@ button.loading::after {
 }
 
 .activity-card-logo { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; border: 2px solid var(--border-main); }
+
+/* Gemini-Forced Modal Style - To override all conflicts */
+.gemini-modal-overlay-force-style {
+  z-index: 9999 !important;
+  display: none !important;
+  padding-top: 100px !important;
+  position: fixed !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: auto !important;
+  background-color: rgba(0,0,0,0.8) !important;
+}
+
+.gemini-modal-overlay-force-style .custom-modal {
+    background-color: var(--bg-panel);
+    margin: 5% auto 15% auto;
+    border: 4px solid var(--border-main);
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 8px 8px 0 var(--border-main);
+    animation: animatezoom 0.6s;
+}
+
+@keyframes animatezoom {
+    from {transform: scale(0)} 
+    to {transform: scale(1)}
+}
+
+.ql-toolbar { position: relative !important; z-index: 1001 !important; }
