@@ -10,7 +10,6 @@ python3.pkgs.buildPythonApplication rec {
 
   srcs = [
     ../backend
-    ../frontend
   ];
 
   sourceRoot = "backend";
@@ -21,29 +20,19 @@ python3.pkgs.buildPythonApplication rec {
   ];
 
   propagatedBuildInputs = with python3.pkgs; [
-    fastapi
-    uvicorn
+    django
+    django-stubs
     gunicorn
-    sqlalchemy
-    pydantic
-    pydantic-settings
-    python-jose
-    passlib
-    bcrypt
-    python-multipart
     pytest
-    pytest-asyncio
-    alembic
-    httpx
+    pytest-django
+    mypy
     ruff
   ];
 
-  # We want to include the frontend and backend in the package
-  # The app expects frontend to be in a certain relative path
+  # We want to include the backend in the package
   postInstall = ''
     mkdir -p $out/share/mon-projet-de-vie
-    cp -r ../frontend $out/share/mon-projet-de-vie/
-    cp -r ../backend/src $out/share/mon-projet-de-vie/backend-src
+    cp -r core adventure manage.py $out/share/mon-projet-de-vie/
   '';
 
   doCheck = false;

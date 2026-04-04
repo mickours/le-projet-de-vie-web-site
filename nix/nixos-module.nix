@@ -78,18 +78,8 @@ in
   config = mkIf cfg.enable {
     systemd.services.mon-projet-de-vie = let
       pythonEnv = pkgs.python3.withPackages (p: [
-        p.uvicorn
+        p.django
         p.gunicorn
-        p.fastapi
-        p.sqlalchemy
-        p.pydantic
-        p.pydantic-settings
-        p.python-jose
-        p.passlib
-        p.bcrypt
-        p.python-multipart
-        p.alembic
-        p.httpx
       ]);
     in {
       description = "L'aventure de l'Orientation Backend Service";
@@ -97,24 +87,25 @@ in
       wantedBy = [ "multi-user.target" ];
 
       environment = {
-        DATABASE_URL = cfg.databaseUrl;
-        ALLOWED_ORIGINS = builtins.toJSON cfg.allowedOrigins;
-        FRONTEND_PATH = "${cfg.package}/share/mon-projet-de-vie/frontend";
-        UPLOADS_PATH = "${cfg.dataDir}/uploads";
+        DATABASE_PATH = "${cfg.dataDir}/db.sqlite3";
+        ALLOWED_HOSTS = builtins.concatStringsSep "," cfg.allowedOrigins;
+        STATIC_ROOT = "${cfg.dataDir}/staticfiles";
+        DEBUG = "False";
       };
 
       serviceConfig = {
-        # We need to make sure the app can find its modules
         # Running gunicorn from the backend source directory
-        ExecStart = "${pythonEnv}/bin/python -m gunicorn --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind ${cfg.host}:${toString cfg.port} main:app";
-        WorkingDirectory = "${cfg.package}/share/mon-projet-de-vie/backend-src";
+        ExecStart = "${pythonEnv}/bin/gunicorn --workers 4 --bind ${cfg.host}:${toString cfg.port} core.wsgi:application";
+        WorkingDirectory = "${cfg.package}/share/mon-projet-de-vie";
 
         StateDirectory = "mon-projet-de-vie";
-        # Ensure the uploads directory exists within dataDir and seed the database
+        # Ensure the directories exist, run migrations, collectstatic and seed the database
         ExecStartPre = [
-          "+${pkgs.coreutils}/bin/mkdir -p ${cfg.dataDir}/uploads"
+          "+${pkgs.coreutils}/bin/mkdir -p ${cfg.dataDir}/staticfiles"
           "+${pkgs.coreutils}/bin/chown -R mon-projet-de-vie:mon-projet-de-vie ${cfg.dataDir}"
-          "${pythonEnv}/bin/python seed.py"
+          "${pythonEnv}/bin/python manage.py migrate --noinput"
+          "${pythonEnv}/bin/python manage.py collectstatic --noinput"
+          "${pythonEnv}/bin/python manage.py seed"
         ];
 
         EnvironmentFile = let
