@@ -80,6 +80,7 @@ in
       pythonEnv = pkgs.python3.withPackages (p: [
         p.django
         p.gunicorn
+        p.whitenoise
       ]);
     in {
       description = "L'aventure de l'Orientation Backend Service";

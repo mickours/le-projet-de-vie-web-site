@@ -27,6 +27,7 @@ python3.pkgs.buildPythonApplication rec {
     pytest-django
     mypy
     ruff
+    whitenoise
   ];
 
   # We want to include the backend in the package
