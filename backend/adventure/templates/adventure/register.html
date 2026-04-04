@@ -1,0 +1,46 @@
+{% extends 'adventure/base.html' %}
+{% load static %}
+
+{% block content %}
+<section id="register-section" class="panel view">
+    <div id="register-box">
+        <h2><span class="icon">✨</span> Nouvel Aventurier</h2>
+        <form method="post" id="register-form">
+            {% csrf_token %}
+            {% if form.errors %}
+            <p style="color: red;">Des erreurs sont survenues. Vérifie tes informations !</p>
+            {% endif %}
+            <div class="form-group">
+                <label for="username">Nom d'aventurier</label>
+                <input type="text" name="username" id="username" required autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <div class="password-wrapper">
+                    <input type="password" name="password" id="password" required autocomplete="new-password">
+                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility(this)" title="Afficher/Masquer le mot de passe">👁️</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="role">Ton rôle</label>
+                <select name="role" id="role" required>
+                    {% for role in roles %}
+                    <option value="{{ role.id }}">{{ role.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="level">Ton niveau</label>
+                <select name="level" id="level">
+                    <option value="">-- Choisir un niveau --</option>
+                    {% for level in levels %}
+                    <option value="{{ level.id }}">{{ level.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit">Rejoindre l'aventure</button>
+        </form>
+        <p class="hint">Déjà inscrit ? <a href="{% url 'login' %}">Retour à la connexion</a></p>
+    </div>
+</section>
+{% endblock %}

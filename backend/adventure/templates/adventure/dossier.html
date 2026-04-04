@@ -8,8 +8,39 @@
         <h2><span class="icon">📜</span> Mon Dossier Personnel</h2>
         <button id="print-btn" onclick="window.print()">Imprimer mon dossier</button>
     </div>
+    
     <div id="dossier-content">
-        <p>Bientôt disponible : visualisez toutes vos quêtes terminées ici.</p>
+        {% regroup user_activities by activity.theme as theme_list %}
+        
+        {% for theme_group in theme_list %}
+        <div class="theme-section">
+            <h3 class="mt-2"><span class="icon">📜</span> {{ theme_group.grouper.label|default:"Autres Quêtes" }}</h3>
+            <div class="manga-grid">
+                {% for ua in theme_group.list %}
+                <div class="activity-card">
+                    <div class="activity-card-header">
+                        <h3>{{ ua.activity.title }}</h3>
+                        <span class="badge badge-type">Terminée ✅</span>
+                    </div>
+                    <div class="activity-card-body">
+                        {% if ua.notes %}
+                        <div class="notes-box mt-1">
+                            <strong>Mes notes :</strong>
+                            <p><em>{{ ua.notes }}</em></p>
+                        </div>
+                        {% endif %}
+                        <a href="{% url 'adventure:activity_detail' ua.activity.id %}" class="open-activity mt-1" style="text-decoration: none;">Revoir la quête</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="panel text-center py-4">
+            <p>Tu n'as pas encore terminé de quête. Lance-toi !</p>
+            <a href="{% url 'adventure:activity_list' %}" class="cloud-btn mt-2" style="text-decoration: none; display: inline-block;">Voir les quêtes</a>
+        </div>
+        {% endfor %}
     </div>
 </section>
 {% endblock %}

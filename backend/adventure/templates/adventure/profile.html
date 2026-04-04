@@ -1,5 +1,5 @@
 {% extends 'adventure/base.html' %}
-{% load static %}
+{% load static adventure_extras %}
 
 {% block content %}
 <section id="profile-section" class="panel view">
@@ -9,11 +9,47 @@
     </div>
     <p>Gère tes informations d'aventurier !</p>
     
-    <div class="panel mt-2">
-        <p><strong>Nom d'aventurier :</strong> {{ user.username }}</p>
-        <p><strong>Rôle :</strong> {{ user.role.label|default:"Non spécifié" }}</p>
-        <p><strong>Niveau :</strong> {{ user.level.label|default:"Non spécifié" }}</p>
-        <p><strong>Avatar :</strong> {{ user.avatar }}</p>
-    </div>
+    <form method="post" id="profile-form" class="mt-2">
+        {% csrf_token %}
+        <div class="form-grid-profile">
+            <div class="form-group">
+                <label for="prof-username">Nom d'aventurier</label>
+                <input type="text" id="prof-username" value="{{ user.username }}" readonly disabled>
+                <small>Le nom d'aventurier ne peut pas être changé.</small>
+            </div>
+            <div class="form-group">
+                <label for="prof-age">Ton âge</label>
+                <input type="number" name="age" id="prof-age" min="1" max="120" value="{{ user.age|default:'' }}">
+            </div>
+            <div class="form-group">
+                <label for="prof-role">Ton rôle</label>
+                <select name="role_id" id="prof-role" required>
+                    {% for role in roles %}
+                    <option value="{{ role.id }}" {% if user.role_id == role.id %}selected{% endif %}>{{ role.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="prof-level">Ton niveau</label>
+                <select name="level_id" id="prof-level">
+                    <option value="">-- Aucun --</option>
+                    {% for level in levels %}
+                    <option value="{{ level.id }}" {% if user.level_id == level.id %}selected{% endif %}>{{ level.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <h3 class="mt-2">Choisir un Avatar</h3>
+        <div class="avatar-grid mb-2">
+            {% for avatar in "👤,🥷,🧙,🤺,🏴‍☠️,🤖,🦸,🧛,🧚,🧜,🐉,👺"|split:"," %}
+            <label class="avatar-option">
+                <input type="radio" name="avatar" value="{{ avatar }}" {% if user.avatar == avatar %}checked{% endif %}>
+                <span class="avatar-icon">{{ avatar }}</span>
+            </label>
+            {% endfor %}
+        </div>
+        <button type="submit">Enregistrer les changements</button>
+    </form>
 </section>
 {% endblock %}
