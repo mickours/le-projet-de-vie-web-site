@@ -2,6 +2,6 @@
 set -e
 echo "Running tests..."
 cd backend
-export PYTHONPATH=$PYTHONPATH:$(pwd)/src
-uv run python -m pytest src/tests
+export DJANGO_SETTINGS_MODULE=core.settings
+uv run python -m pytest core/ adventure/
 echo "Tests passed!"

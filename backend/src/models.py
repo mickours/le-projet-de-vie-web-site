@@ -8,14 +8,15 @@ from sqlalchemy import (
     DateTime,
     Table,
 )
-from sqlalchemy.orm import relationship, declarative_base
-from datetime import datetime
-
-Base = declarative_base()
+from sqlalchemy.orm import relationship, DeclarativeBase
 
 
-user_relationships = Table(
-    "user_relationships",
+class Base(DeclarativeBase):
+    pass
+
+
+activity_roles = Table(
+    "activity_roles",
     Base.metadata,
     Column("parent_id", Integer, ForeignKey("users.id"), primary_key=True),
     Column("child_id", Integer, ForeignKey("users.id"), primary_key=True),

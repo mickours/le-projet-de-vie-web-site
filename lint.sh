@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
-echo "Running lint and format..."
+echo "Running lint, format and type checking..."
 cd backend
 uv run ruff format .
 uv run ruff check --fix .
-echo "Linting passed!"
+uv run mypy core/ adventure/
+echo "All checks passed!"
