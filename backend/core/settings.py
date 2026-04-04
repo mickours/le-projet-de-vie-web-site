@@ -16,16 +16,19 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+import os
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-p&_k_(-m7!jocm&1@j0f@+1&sk$h@@dm_r31n6953e0_7kw1ks"
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-p&_k_(-m7!jocm&1@j0f@+1&sk$h@@dm_r31n6953e0_7kw1ks")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "True").lower() in ("true", "1", "t")
 
-ALLOWED_HOSTS: list[str] = []
+allowed_hosts_env = os.environ.get("ALLOWED_HOSTS", "")
+ALLOWED_HOSTS: list[str] = [h.strip() for h in allowed_hosts_env.split(",") if h.strip()] if allowed_hosts_env else []
 
 
 # Application definition
@@ -78,7 +81,7 @@ WSGI_APPLICATION = "core.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": os.environ.get("DATABASE_PATH", BASE_DIR / "db.sqlite3"),
     }
 }
 
@@ -122,4 +125,4 @@ STATIC_URL = "static/"
 LOGIN_REDIRECT_URL = "adventure:dashboard"
 LOGOUT_REDIRECT_URL = "adventure:home"
 
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = os.environ.get("STATIC_ROOT", BASE_DIR / "staticfiles")
