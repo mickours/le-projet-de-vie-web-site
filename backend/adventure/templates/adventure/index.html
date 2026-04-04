@@ -1,0 +1,282 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon projet de Vie me Libère</title>
+    <link rel="icon" type="image/svg+xml" href="{% static 'adventure/favicon.svg' %}">
+    <link rel="stylesheet" href="{% static 'adventure/css/style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .landing-hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            border: 5px solid var(--border-main);
+            box-shadow: 15px 15px 0 var(--border-main);
+            margin: 2rem;
+            border-radius: 20px;
+            padding: 2rem;
+            color: white;
+        }
+        .landing-title {
+            font-size: 3.5rem;
+            -webkit-text-stroke: 2px var(--border-main);
+            text-shadow: 5px 5px 0 var(--border-main);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+        .landing-subtitle {
+            font-size: 1.5rem;
+            background: white;
+            padding: 1rem 2rem;
+            border: 3px solid var(--border-main);
+            box-shadow: 5px 5px 0 var(--border-main);
+            margin-bottom: 2rem;
+            transform: rotate(-1deg);
+            color: var(--text-header);
+        }
+        .start-adventure-div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .start-adventure-btn {
+            font-size: 1.5rem;
+            padding: 1rem 2rem;
+            background: white;
+            color: var(--text-header);
+            text-decoration: none;
+            border: 4px solid var(--border-main);
+            box-shadow: 8px 8px 0 var(--border-main);
+            transition: all 0.2s;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+        .start-adventure-btn:hover {
+            transform: scale(1.05) rotate(1deg);
+            box-shadow: 12px 12px 0 var(--accent-color);
+            background: var(--primary-light);
+        }
+        
+        .content-section {
+            background: white;
+            border: 4px solid var(--border-main);
+            box-shadow: 10px 10px 0 var(--border-main);
+            margin: 2rem;
+            border-radius: 15px;
+            padding: 2rem;
+        }
+        .content-section h2 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            border-bottom: 4px solid var(--border-main);
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+        .content-section p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .testimonial-card {
+            background: var(--bg-body);
+            border: 3px solid var(--border-main);
+            box-shadow: 6px 6px 0 var(--border-main);
+            padding: 1.5rem;
+            border-radius: 10px;
+            position: relative;
+        }
+        .testimonial-card::before {
+            content: '"';
+            font-size: 4rem;
+            color: var(--accent-color);
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            opacity: 0.5;
+            font-family: serif;
+        }
+        .testimonial-author {
+            font-weight: bold;
+            text-align: right;
+            margin-top: 1rem;
+            color: var(--primary-color);
+        }
+        
+        @media (max-width: 768px) {
+            .landing-title { font-size: 2rem; }
+            .landing-hero { margin: 1rem; padding: 1rem; }
+            .content-section { margin: 1rem; padding: 1.5rem; }
+        }
+        .avatar-circle {
+            font-size: 4rem;
+            background: var(--bg-main);
+            border: 4px solid var(--border-main);
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem auto;
+            box-shadow: 4px 4px 0 var(--border-main);
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <section class="landing-hero">
+            <h1 class="landing-title">Mon projet de Vie<br>me Libère</h1>
+            <div class="landing-subtitle">Découvrez votre chemin vers l'épanouissement</div>
+            <p style="font-size: 1.2rem; max-width: 800px; margin: 0 auto 2rem auto; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
+                Le projet de vie est la mise en acte de la liberté existentielle : notre capacité à donner un sens à notre vie, quelles que soient les circonstances.<br>
+                Il permet de transformer nos envies en une vie réellement choisie.<br>
+                Ce site vous invite à apprendre à vous penser vous-même, pour devenir l’auteur de votre vie.<br>
+                Son objectif est de vous accompagner dans une question essentielle :
+            </p>
+            <h2 style="font-size: 2rem;">Quelle vie ai-je envie de vivre ?</h2>
+            Pour y répondre, nous vous proposons une architecture en trois niveaux
+        </section>
+
+        <section class="content-section">
+            <h2>Niveau 1 : L’Aventure de l’Orientation (ADO)</h2>
+            <p>
+            Ce niveau s’adresse aux collégiens, lycéens et étudiants.
+            </p>
+            <p>
+            L’orientation n’est pas seulement un choix scolaire.<br>
+            C’est le premier terrain d’apprentissage du projet de vie.
+            </p>
+            <p>
+            <strong>S’orienter, c’est déjà commencer à se choisir.</strong>
+            </p>
+            <div class="start-adventure-div">
+            <a href="{% url 'adventure:dashboard' %}" class="start-adventure-btn">🚀 Lancer l'Aventure de l'Orientation</a>
+            </div>
+        </section>
+        
+        <section class="content-section">
+            <h2>Niveau 2 : Le Projet de Vie</h2>
+            <p>
+            Ce niveau s’adresse aux jeunes adultes et aux adultes.
+            </p>
+            <p>
+            Il permet de construire concrètement une vie en accord avec soi-même, en transformant ses aspirations en choix réels.
+            </p>
+        </section>
+        
+        <section class="content-section">
+            <h2>Niveau 3 : L’Université Citoyenne du Bonheur</h2>
+            <p>
+            Ce niveau propose un accompagnement à la mise en œuvre de votre projet de vie.
+            </p>
+            <p>
+            Vous y trouverez des ressources, des outils et un cadre pour avancer, vous engager, et construire une vie qui vous ressemble profondément.
+            </p>
+        </section>
+        
+        <section class="content-section">
+            <h2>Qui sommes nous ?</h2>
+            <p>Psychologue, auteure et créatrice d’outils pédagogiques, je suis
+            engagée dans l’accompagnement des personnes dans leur quête de sens. Mon
+            parcours allie psychologie, sciences de l’éducation, théâtre et en
+            art-thérapie, nourri par des années d’expérience auprès d’adolescents et
+            de jeunes adultes.</p>
+            <p>Une conviction guide mon travail: chacun possède la capacité de se
+            comprendre, de se choisir et de construire un projet de vie authentique.
+            Pour cela, il est essentiel d’apprendre à se connaître, à décrypter le
+            monde, et à créer des liens significatifs entre les deux.</p>
+            <p>Cette conviction a donné naissance au site <strong>Le projet de vie
+            libère</strong>, un espace interactif, conçu comme un parcours
+            d’exploration et de transformation. Il s’adresse aux jeunes, aux
+            parents, aux professionnels de l’éducation, et aux adultes en quête de
+            sens.</p>
+            <p>Mon objectif est clair : offrir des repères, des outils et des
+            espaces pour permettre à chacun de devenir acteur de sa vie, en pleine
+            conscience et en liberté.</p>
+
+            <div class="team-avatars" style="display: flex; gap: 2rem; justify-content: center; margin-top: 2rem;">
+                <div class="team-member" style="text-align: center;">
+                    <div class="avatar-circle">
+                        <img src="{% static 'adventure/img/avatar_beatrice.jpg' %}" alt="Béatrice avatar" width="128" height="128"/>
+                    </div>
+                    <p style="font-weight: bold; font-family: 'Comic Neue', cursive;">Béatrice: Créatrice</p>
+                </div>
+                <div class="team-member" style="text-align: center;">
+                    <div class="avatar-circle" style="font-size: 4rem; background: var(--bg-main); border: 4px solid var(--border-main); border-radius: 50%; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto; box-shadow: 4px 4px 0 var(--border-main);">
+                        <img src="{% static 'adventure/img/avatar_michael.jpg' %}" alt="Michael avatar" width="128" height="128"/>
+                    </div>
+                    <p style="font-weight: bold; font-family: 'Comic Neue', cursive;">Michaël: WebMaster</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>Pourquoi ce site ?</h2>
+            <p>Notre site n’est pas "juste" un outil de plus. C’est une <strong>réponse radicale et bienveillante</strong> à un système qui
+            laisse trop de monde sur le bord de la route. En combinant <strong>éducation à l’orientation</strong>, <strong>cours du
+            bonheur</strong> et <strong>accompagnement</strong>, nous souhaitons offrir une <strong>boussole</strong> pour naviguer dans un monde
+            complexe.
+            </p>
+            <p>Parce que le sens et l’épanouissement ne devraient pas être des
+            privilèges, nous mettons à disposition des outils concrets, validés par
+            des années d’expérience, <strong>gratuitement</strong>, <strong>sans
+            jugement</strong>, et avec l’expertise qui fait la différence pour
+            offrir à chacun les clés d’une orientation éclairée, d’un bien-être
+            durable et d’un accompagnement bienveillant.</p>
+            <p>Fondé sur des <strong>méthodes éprouvées</strong> et enrichi par des
+            retours terrain, notre contenu est conçu pour être <strong>simple,
+            inclusif et efficace</strong>. Pas de jargon, pas de barrières : des
+            ressources adaptées aux différents besoins, et une approche ludique,
+            inspirée des quêtes manga.</p>
+            <p><em>Le projet de vie libère</em> est plus qu’un site : c’est un
+            <strong>mouvement</strong> pour une éducation qui place l’individu au
+            centre. En démocratisant l’accès à l’orientation et au bien-être, nous
+            voulons contribuer à une society où chacun peut <strong>devenir acteur
+            de sa vie</strong>, en conscience et en liberté. Rejoignez-nous pour
+            co-construire ce chemin, parce que votre projet de vie mérite d’être
+            vécu, pas subi.</p>
+        </section>
+
+        <section class="content-section">
+            <h2>Témoignages</h2>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <p>Grâce à la plateforme, j'ai enfin pu mettre des mots sur ce que je voulais vraiment faire. L'aspect 'quête' m'a énormément motivé à avancer dans mon dossier d'orientation sans que ça ressemble à un devoir d'école.</p>
+                    <div class="testimonial-author">— Lucas, Élève de 3ème</div>
+                </div>
+                <div class="testimonial-card">
+                    <p>En tant que parent, il est souvent difficile d'aborder le sujet de l'avenir sans créer de tensions. Ce site nous a offert un support neutre et amusant pour discuter des projets de notre fille.</p>
+                    <div class="testimonial-author">— Sophie, Maman de Léa</div>
+                </div>
+                <div class="testimonial-card">
+                    <p>Un outil fantastique qui dépoussière l'orientation ! Je l'utilise régulièrement avec mes élèves et je vois une réelle différence dans leur implication. Ils sont acteurs de leur parcours.</p>
+                    <div class="testimonial-author">— Marc, Professeur principal</div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p style="text-align: center; padding: 2rem; font-family: 'Comic Neue', cursive; font-weight: bold; color: var(--text-body);">
+            &copy; 2026 Mon projet de Vie me Libère
+        </p>
+    </footer>
+</body>
+</html>

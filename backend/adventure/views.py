@@ -16,8 +16,7 @@ class AdventureUserCreationForm(UserCreationForm):
 
 
 def home(request):
-    return render(request, "adventure/home.html")
-
+    return render(request, 'adventure/index.html')
 
 def dashboard(request):
     levels = Level.objects.all()
