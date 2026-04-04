@@ -124,6 +124,19 @@
             .landing-hero { margin: 1rem; padding: 1rem; }
             .content-section { margin: 1rem; padding: 1.5rem; }
         }
+        .avatar-circle {
+            font-size: 4rem;
+            background: var(--bg-main);
+            border: 4px solid var(--border-main);
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem auto;
+            box-shadow: 4px 4px 0 var(--border-main);
+        }
     </style>
 </head>
 <body>
@@ -154,7 +167,7 @@
             <strong>S’orienter, c’est déjà commencer à se choisir.</strong>
             </p>
             <div class="start-adventure-div">
-            <a href="/adventure" class="start-adventure-btn">🚀 Lancer l'Aventure de l'Orientation</a>
+            <a href="/pages/adventure" class="start-adventure-btn">🚀 Lancer l'Aventure de l'Orientation</a>
             </div>
         </section>
         
@@ -180,35 +193,65 @@
         
         <section class="content-section">
             <h2>Qui sommes nous ?</h2>
-            <p>
-                Nous sommes un collectif de passionnés, d'éducateurs, de psychologues et de professionnels de l'orientation qui partagent une vision commune : <strong>l'orientation ne devrait pas être subie, mais choisie avec joie et conscience.</strong>
-            </p>
-            <p>
-                Notre équipe travaille chaque jour pour créer des outils innovants, ludiques et profondément humains, afin d'accompagner les jeunes (et les moins jeunes !) dans la définition de leur projet de vie. Nous croyons en une approche globale qui prend en compte non seulement les compétences, mais aussi les passions, les valeurs et les aspirations profondes de chacun.
-            </p>
+            <p>Psychologue, auteure et créatrice d’outils pédagogiques, je suis
+            engagée dans l’accompagnement des personnes dans leur quête de sens. Mon
+            parcours allie psychologie, sciences de l’éducation, théâtre et en
+            art-thérapie, nourri par des années d’expérience auprès d’adolescents et
+            de jeunes adultes.</p>
+            <p>Une conviction guide mon travail: chacun possède la capacité de se
+            comprendre, de se choisir et de construire un projet de vie authentique.
+            Pour cela, il est essentiel d’apprendre à se connaître, à décrypter le
+            monde, et à créer des liens significatifs entre les deux.</p>
+            <p>Cette conviction a donné naissance au site <strong>Le projet de vie
+            libère</strong>, un espace interactif, conçu comme un parcours
+            d’exploration et de transformation. Il s’adresse aux jeunes, aux
+            parents, aux professionnels de l’éducation, et aux adultes en quête de
+            sens.</p>
+            <p>Mon objectif est clair : offrir des repères, des outils et des
+            espaces pour permettre à chacun de devenir acteur de sa vie, en pleine
+            conscience et en liberté.</p>
+
             <div class="team-avatars" style="display: flex; gap: 2rem; justify-content: center; margin-top: 2rem;">
                 <div class="team-member" style="text-align: center;">
-                    <div class="avatar-circle" style="font-size: 4rem; background: var(--bg-main); border: 4px solid var(--border-main); border-radius: 50%; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto; box-shadow: 4px 4px 0 var(--border-main);">🐻</div>
-                    <p style="font-weight: bold; font-family: 'Comic Neue', cursive;">Mickaël</p>
+                    <div class="avatar-circle">
+                        <img src="/frontend/img/avatar_beatrice.jpg" alt="Béatrice avatar" width="128" height="128"/>
+                    </div>
+                    <p style="font-weight: bold; font-family: 'Comic Neue', cursive;">Béatrice: Créatrice</p>
                 </div>
                 <div class="team-member" style="text-align: center;">
-                    <div class="avatar-circle" style="font-size: 4rem; background: var(--bg-main); border: 4px solid var(--border-main); border-radius: 50%; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto; box-shadow: 4px 4px 0 var(--border-main);">🦊</div>
-                    <p style="font-weight: bold; font-family: 'Comic Neue', cursive;">Créateur</p>
+                    <div class="avatar-circle" style="font-size: 4rem; background: var(--bg-main); border: 4px solid var(--border-main); border-radius: 50%; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto; box-shadow: 4px 4px 0 var(--border-main);">
+                        <img src="/frontend/img/avatar_michael.jpg" alt="Michael avatar" width="128" height="128"/>
+                    </div>
+                    <p style="font-weight: bold; font-family: 'Comic Neue', cursive;">Michaël: WebMaster</p>
                 </div>
             </div>
         </section>
 
         <section class="content-section">
             <h2>Pourquoi ce site ?</h2>
-            <p>
-                Le constat est simple : trop de personnes se sentent perdues au moment de choisir leur voie. La pression sociale, le manque d'informations claires et la peur de se tromper transforment souvent l'orientation en une source d'angoisse.
+            <p>Notre site n’est pas "juste" un outil de plus. C’est une <strong>réponse radicale et bienveillante</strong> à un système qui
+            laisse trop de monde sur le bord de la route. En combinant <strong>éducation à l’orientation</strong>, <strong>cours du
+            bonheur</strong> et <strong>accompagnement</strong>, nous souhaitons offrir une <strong>boussole</strong> pour naviguer dans un monde
+            complexe.
             </p>
-            <p>
-                <strong>Mon projet de Vie me Libère</strong> a été conçu pour inverser cette tendance. Ce site est une boussole qui vous guide à travers différentes étapes de réflexion. En utilisant les codes visuels et narratifs du manga avec notre module <em>"L'Aventure de l'Orientation"</em>, nous souhaitons rendre cette quête de sens aussi passionnante qu'une véritable épopée. 
-            </p>
-            <p>
-                Ici, vous trouverez des articles, des outils d'introspection, et un parcours gamifié pour vous aider à construire un avenir qui vous ressemble vraiment.
-            </p>
+            <p>Parce que le sens et l’épanouissement ne devraient pas être des
+            privilèges, nous mettons à disposition des outils concrets, validés par
+            des années d’expérience, <strong>gratuitement</strong>, <strong>sans
+            jugement</strong>, et avec l’expertise qui fait la différence pour
+            offrir à chacun les clés d’une orientation éclairée, d’un bien-être
+            durable et d’un accompagnement bienveillant.</p>
+            <p>Fondé sur des <strong>méthodes éprouvées</strong> et enrichi par des
+            retours terrain, notre contenu est conçu pour être <strong>simple,
+            inclusif et efficace</strong>. Pas de jargon, pas de barrières : des
+            ressources adaptées aux différents besoins, et une approche ludique,
+            inspirée des quêtes manga.</p>
+            <p><em>Le projet de vie libère</em> est plus qu’un site : c’est un
+            <strong>mouvement</strong> pour une éducation qui place l’individu au
+            centre. En démocratisant l’accès à l’orientation et au bien-être, nous
+            voulons contribuer à une société où chacun peut <strong>devenir acteur
+            de sa vie</strong>, en conscience et en liberté. Rejoignez-nous pour
+            co-construire ce chemin, parce que votre projet de vie mérite d’être
+            vécu, pas subi.</p>
         </section>
 
         <section class="content-section">

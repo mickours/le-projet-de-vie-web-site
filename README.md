@@ -1,3 +1,7 @@
+# Le projet de Vie Libère
+
+Ce site contient une application pricipale:
+
 # L'aventure de l'Orientation
 
 Plateforme éducative d'orientation avec un style Manga, permettant aux élèves de découvrir des métiers et formations à travers des "quêtes" et de construire leur dossier personnel.
