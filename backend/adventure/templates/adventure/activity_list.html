@@ -1,0 +1,54 @@
+{% extends 'adventure/base.html' %}
+{% load static %}
+
+{% block content %}
+<section id="activities-section" class="panel view">
+    <div class="header-actions">
+        <a href="{% url 'adventure:dashboard' %}" class="back-home-btn" style="text-decoration: none;">&larr; Retour à l'accueil</a>
+        <h2><span class="icon">🏹</span> Tes quêtes disponibles</h2>
+        <form method="get" class="filters">
+            <select name="level_id" onchange="this.form.submit()">
+                <option value="">Tous les niveaux</option>
+                {% for level in levels %}
+                <option value="{{ level.id }}" {% if request.GET.level_id == level.id|stringformat:"i" %}selected{% endif %}>{{ level.label }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    {% regroup activities by theme as theme_list %}
+    {% for theme_group in theme_list %}
+    <div class="theme-section">
+        <div class="theme-header">
+            <h3><span class="icon">📜</span> {{ theme_group.grouper.label|default:"Autres Quêtes" }}</h3>
+        </div>
+        <div class="manga-grid">
+            {% for activity in theme_group.list %}
+            <div class="activity-card">
+                <div class="activity-card-header">
+                    <div class="activity-badges">
+                        {% if activity.type %}<span class="badge badge-type">{{ activity.type.label }}</span>{% endif %}
+                        {% if activity.role %}<span class="badge badge-role">{{ activity.role.label }}</span>{% endif %}
+                        {% if activity.level %}<span class="badge badge-level">{{ activity.level.label }}</span>{% endif %}
+                    </div>
+                    {% if activity.logo_url %}
+                    <img src="{{ activity.logo_url }}" alt="Logo" class="activity-card-logo">
+                    {% endif %}
+                    <h3>{{ activity.title }}</h3>
+                </div>
+                <div class="activity-card-body">
+                    <p>{{ activity.description|truncatewords:20 }}</p>
+                    {% if activity.documents.all %}
+                    <p class="mt-1"><strong>Documents :</strong> {{ activity.documents.count }} fichier(s)</p>
+                    {% endif %}
+                    <a href="{% url 'adventure:activity_detail' activity.id %}" class="open-activity" style="text-decoration: none; display: inline-block; text-align: center;">Ouvrir la quête</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% empty %}
+    <p>Aucune quête disponible pour le moment.</p>
+    {% endfor %}
+</section>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'adventure/base.html' %}
+{% load static %}
+
+{% block content %}
+<section id="dossier-section" class="panel view">
+    <div class="header-actions">
+        <a href="{% url 'adventure:dashboard' %}" class="back-home-btn" style="text-decoration: none;">&larr; Retour à l'accueil</a>
+        <h2><span class="icon">📜</span> Mon Dossier Personnel</h2>
+        <button id="print-btn" onclick="window.print()">Imprimer mon dossier</button>
+    </div>
+    <div id="dossier-content">
+        <p>Bientôt disponible : visualisez toutes vos quêtes terminées ici.</p>
+    </div>
+</section>
+{% endblock %}

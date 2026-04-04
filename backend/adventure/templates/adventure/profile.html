@@ -1,0 +1,19 @@
+{% extends 'adventure/base.html' %}
+{% load static %}
+
+{% block content %}
+<section id="profile-section" class="panel view">
+    <div class="header-actions">
+        <a href="{% url 'adventure:dashboard' %}" class="back-home-btn" style="text-decoration: none;">&larr; Retour à l'accueil</a>
+        <h2><span class="icon">🎭</span> Mon Profil</h2>
+    </div>
+    <p>Gère tes informations d'aventurier !</p>
+    
+    <div class="panel mt-2">
+        <p><strong>Nom d'aventurier :</strong> {{ user.username }}</p>
+        <p><strong>Rôle :</strong> {{ user.role.label|default:"Non spécifié" }}</p>
+        <p><strong>Niveau :</strong> {{ user.level.label|default:"Non spécifié" }}</p>
+        <p><strong>Avatar :</strong> {{ user.avatar }}</p>
+    </div>
+</section>
+{% endblock %}

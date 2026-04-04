@@ -1,0 +1,18 @@
+{% extends 'adventure/base.html' %}
+{% load static %}
+
+{% block content %}
+<section id="landing-section" class="panel view">
+    <div style="text-align: center; padding: 4rem 2rem;">
+        <h1 style="font-size: 3.5rem; margin-bottom: 2rem;"><span class="icon">⚔️</span> L'aventure de l'Orientation</h1>
+        <p style="font-size: 1.5rem; margin-bottom: 3rem;">
+            Prêt à découvrir ta destinée ? Lance-toi dans l'aventure !
+        </p>
+        <div class="button-cloud" style="justify-content: center;">
+            <a href="{% url 'adventure:dashboard' %}" class="cloud-btn" style="padding: 1.5rem 3rem; font-size: 1.2rem; text-decoration: none;">
+                Démarrer mon aventure
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'adventure/base.html' %}
+{% load static %}
+
+{% block content %}
+<section id="home-section" class="panel view">
+    <h2><span class="icon">🗺️</span> Ton Tableau de Bord</h2>
+    <p style="margin-bottom: 2rem;">Choisis ton parcours pour explorer les métiers et les formations selon ton profil.</p>
+    
+    <div class="dashboard-grid">
+        <div class="dashboard-group">
+            <h3><span class="icon">👥</span> Explore par Rôle</h3>
+            <div id="role-buttons" class="button-cloud">
+                {% for role in roles %}
+                <a href="{% url 'adventure:activity_list' %}?role_id={{ role.id }}" class="cloud-btn role-filter-btn" data-id="{{ role.id }}">
+                    <div class="role-icon">{{ role.icon }}</div>
+                    {{ role.label }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="dashboard-group">
+            <h3><span class="icon">🎓</span> Explore par Niveau</h3>
+            <div id="level-buttons" class="button-cloud">
+                {% for level in levels %}
+                <a href="{% url 'adventure:activity_list' %}?level_id={{ level.id }}" class="cloud-btn level-filter-btn" data-id="{{ level.id }}">
+                    <div class="role-icon">{{ level.icon }}</div>
+                    {{ level.label }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'adventure/base.html' %}
+{% load static %}
+
+{% block content %}
+<section id="activity-detail-section" class="panel view">
+    <div class="header-actions">
+        <a href="{% url 'adventure:activity_list' %}" class="back-btn" style="text-decoration: none;">&larr; Retour aux quêtes</a>
+    </div>
+    
+    <div id="activity-content">
+        <div class="activity-detail-header">
+            <div class="activity-badges mb-1">
+                {% if activity.type %}<span class="badge badge-type">{{ activity.type.label }}</span>{% endif %}
+                {% if activity.role %}<span class="badge badge-role">{{ activity.role.label }}</span>{% endif %}
+                {% if activity.level %}<span class="badge badge-level">{{ activity.level.label }}</span>{% endif %}
+            </div>
+            {% if activity.logo_url %}
+            <img src="{{ activity.logo_url }}" alt="Logo" class="activity-card-logo">
+            {% endif %}
+            <h2>{{ activity.title }}</h2>
+        </div>
+        
+        <div class="detail-body">
+            <div class="quest-description-box">
+                <div>{{ activity.description|safe }}</div>
+            </div>
+            
+            {% if activity.video_url %}
+            <div class="video-section">
+                <div class="video-container">
+                    <iframe src="{{ activity.video_url }}" width="560" height="315" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if activity.documents.all %}
+            <div class="documents-section-box">
+                <h4><span class="icon">📂</span> Documents pour l'aventure :</h4>
+                <div class="button-cloud" style="justify-content: flex-start; margin-top: 1rem;">
+                    {% for doc in activity.documents.all %}
+                    <a href="{{ doc.url }}" target="_blank" class="cloud-btn" style="min-width: auto; flex-direction: row; padding: 0.8rem 1.2rem;">
+                        <span style="font-size: 1.5rem;">📄</span> {{ doc.filename }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if user.is_authenticated %}
+    <div class="activity-actions" id="authenticated-actions">
+        <h3><span class="icon">🏆</span> Ma Progression</h3>
+        <form method="post" action="{% url 'adventure:save_progress' activity.id %}">
+            {% csrf_token %}
+            <div class="progression-grid">
+                <div class="form-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" name="is_completed" {% if user_activity.is_completed %}checked{% endif %}> 
+                        <span>Quête terminée !</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label for="quest-notes">Mes notes d'aventurier</label>
+                    <textarea name="notes" id="quest-notes" rows="3" placeholder="Qu'as-tu appris aujourd'hui ?">{{ user_activity.notes }}</textarea>
+                </div>
+            </div>
+            <button type="submit" id="save-progress-btn">Enregistrer mon exploit</button>
+        </form>
+    </div>
+    {% else %}
+    <div class="activity-actions" id="guest-actions">
+        <h3><span class="icon">🚀</span> Envie de rejoindre l'aventure ?</h3>
+        <p>Connecte-toi pour créer ton dossier personnalisé, enregistrer ta progression et partager tes impressions avec les autres aventuriers !</p>
+        <a href="{% url 'login' %}" class="mt-2 start-adventure-btn" style="text-decoration: none; display: inline-block; text-align: center;">Démarrer mon aventure</a>
+    </div>
+    {% endif %}
+
+    <div class="comments-section">
+        <h3><span class="icon">💬</span> Commentaires</h3>
+        <div id="comments-list">
+            {% for comment in comments %}
+            <div class="comment-item">
+                <p class="comment-author">{{ comment.user.username }}</p>
+                <p>{{ comment.content }}</p>
+                <small>{{ comment.created_at|date:"d/m/Y" }}</small>
+            </div>
+            {% empty %}
+            <p>Aucun commentaire pour le moment.</p>
+            {% endfor %}
+        </div>
+        
+        {% if user.is_authenticated %}
+        <form method="post" action="{% url 'adventure:add_comment' activity.id %}" id="comment-form">
+            {% csrf_token %}
+            <textarea name="content" id="comment-input" placeholder="Partage ton avis..." required></textarea>
+            <button type="submit">Envoyer</button>
+        </form>
+        {% else %}
+        <div id="guest-comment-msg" class="mt-1">
+            <p><em>Connecte-toi pour ajouter un commentaire.</em></p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

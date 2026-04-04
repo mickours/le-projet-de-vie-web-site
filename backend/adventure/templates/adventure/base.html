@@ -1,0 +1,81 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}L'aventure de l'Orientation{% endblock %}</title>
+    <link rel="icon" type="image/svg+xml" href="{% static 'adventure/favicon.svg' %}">
+    <link rel="stylesheet" href="{% static 'adventure/css/style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <h1><a href="{% url 'adventure:home' %}" style="text-decoration: none; color: inherit;"><span class="icon">⚔️</span> L'aventure de l'Orientation</a></h1>
+            
+            <div id="user-info">
+                <button id="menu-toggle" aria-label="Ouvrir le menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                
+                <div id="nav-wrapper">
+                    <nav id="main-nav">
+                        <a href="{% url 'adventure:dashboard' %}" class="nav-btn {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                            <span>Accueil</span>
+                        </a>
+                        <a href="{% url 'adventure:activity_list' %}" class="nav-btn {% if request.resolver_match.url_name == 'activity_list' %}active{% endif %}">
+                            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M14.5 18l-4.5-4.5-4.5 4.5-1.5-1.5 6-6 6 6-1.5 1.5zM14.5 12l-4.5-4.5-4.5 4.5-1.5-1.5 6-6 6 6-1.5 1.5z"/></svg>
+                            <span>Quêtes</span>
+                        </a>
+                        <a href="{% url 'adventure:dossier' %}" class="nav-btn {% if request.resolver_match.url_name == 'dossier' %}active{% endif %}">
+                            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                            <span>Dossier</span>
+                        </a>
+                        <a href="{% url 'adventure:profile' %}" class="nav-btn {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            <span>Profil</span>
+                        </a>
+                    </nav>
+                    
+                    <div id="user-controls">
+                        {% if user.is_authenticated %}
+                        <div id="user-display">
+                            <span id="avatar-display">{{ user.avatar }}</span>
+                            <span id="username-display">{{ user.username }}</span>
+                        </div>
+                        <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" id="logout-btn" title="Déconnexion">
+                                <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>
+                            </button>
+                        </form>
+                        {% else %}
+                        <a href="{% url 'login' %}" id="login-nav-btn" class="nav-btn">Connexion</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <main id="app">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2026 L'aventure de l'Orientation - <span id="current-role">{% if user.is_authenticated %}{{ user.role.label }}{% else %}Visiteur{% endif %}</span></p>
+        <div style="margin-top: 1rem; display: flex; justify-content: center; gap: 1.5rem; font-size: 0.9rem;">
+            <a href="/" style="color: #666; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#000'" onmouseout="this.style.color='#666'">Retour à l'accueil</a>
+            <a href="/admin" style="color: #666; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#000'" onmouseout="this.style.color='#666'">Administration</a>
+        </div>
+    </footer>
+
+    <script src="{% static 'adventure/js/ui.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
