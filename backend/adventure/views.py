@@ -1,9 +1,20 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from .models import Activity, Level, Role, UserActivity, Comment, User
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
+from django.contrib.admin.views.decorators import staff_member_required
+from django.views.decorators.http import require_POST
+from .models import (
+    Activity,
+    Level,
+    Role,
+    Theme,
+    Type,
+    UserActivity,
+    Comment,
+    User,
+)
 
 
 class AdventureUserCreationForm(UserCreationForm):
@@ -16,7 +27,8 @@ class AdventureUserCreationForm(UserCreationForm):
 
 
 def home(request):
-    return render(request, 'adventure/index.html')
+    return render(request, "adventure/index.html")
+
 
 def dashboard(request):
     levels = Level.objects.all()
@@ -59,8 +71,6 @@ def register(request):
             return redirect("adventure:dashboard")
     else:
         form = AdventureUserCreationForm()
-
-    # Pre-populate Role and Level for the form rendering
     roles = Role.objects.exclude(label="admin")
     levels = Level.objects.all()
     return render(
@@ -73,18 +83,15 @@ def register(request):
 def activity_list(request):
     level_id = request.GET.get("level_id")
     role_id = request.GET.get("role_id")
-
     activities = (
         Activity.objects.all()
         .select_related("theme", "type", "level", "role")
         .prefetch_related("documents")
     )
-
     if level_id:
         activities = activities.filter(level_id=level_id)
     if role_id:
         activities = activities.filter(role_id=role_id)
-
     levels = Level.objects.all()
     return render(
         request,
@@ -96,13 +103,11 @@ def activity_list(request):
 def activity_detail(request, activity_id):
     activity = get_object_or_404(Activity, id=activity_id)
     comments = activity.comments.filter(is_moderated=True).order_by("-created_at")
-
     user_activity = None
     if request.user.is_authenticated:
         user_activity, _ = UserActivity.objects.get_or_create(
             user=request.user, activity=activity
         )
-
     return render(
         request,
         "adventure/activity_detail.html",
@@ -154,7 +159,85 @@ def profile(request):
         user.level_id = request.POST.get("level_id")
         user.save()
         return redirect("adventure:profile")
-
     roles = Role.objects.exclude(label="admin")
     levels = Level.objects.all()
     return render(request, "adventure/profile.html", {"roles": roles, "levels": levels})
+
+
+@staff_member_required
+def admin_dashboard(request):
+    if request.method == "POST":
+        Activity.objects.create(
+            title=request.POST.get("title"),
+            description=request.POST.get("description"),
+            level_id=request.POST.get("level_id"),
+            role_id=request.POST.get("role_id"),
+            theme_id=request.POST.get("theme_id"),
+            type_id=request.POST.get("type_id"),
+        )
+        return redirect("adventure:admin_dashboard")
+
+    return render(
+        request,
+        "adventure/admin.html",
+        {
+            "levels": Level.objects.all(),
+            "roles": Role.objects.exclude(label="admin"),
+            "themes": Theme.objects.all(),
+            "types": Type.objects.all(),
+            "activities": Activity.objects.all().select_related(
+                "level", "role", "theme", "type"
+            ),
+            "users_list": User.objects.exclude(is_superuser=True).select_related(
+                "role", "level"
+            ),
+            "pending_comments": Comment.objects.filter(
+                is_moderated=False
+            ).select_related("user", "activity"),
+        },
+    )
+
+
+@staff_member_required
+@require_POST
+def admin_activity_delete(request, activity_id):
+    get_object_or_404(Activity, id=activity_id).delete()
+    return redirect("adventure:admin_dashboard")
+
+
+@staff_member_required
+@require_POST
+def admin_user_create(request):
+    username = request.POST.get("username")
+    password = request.POST.get("password")
+    if username and password:
+        User.objects.create_user(
+            username=username,
+            password=password,
+            role_id=request.POST.get("role_id"),
+            level_id=request.POST.get("level_id") or None,
+        )
+    return redirect("adventure:admin_dashboard")
+
+
+@staff_member_required
+@require_POST
+def admin_user_delete(request, user_id):
+    get_object_or_404(User, id=user_id).delete()
+    return redirect("adventure:admin_dashboard")
+
+
+@staff_member_required
+@require_POST
+def admin_comment_approve(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    comment.is_moderated = True
+    comment.save()
+    return redirect("adventure:admin_dashboard")
+
+
+@staff_member_required
+@require_POST
+def admin_comment_delete(request, comment_id):
+    get_object_or_404(Comment, id=comment_id).delete()
+    return redirect("adventure:admin_dashboard")

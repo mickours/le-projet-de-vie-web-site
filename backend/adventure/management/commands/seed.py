@@ -50,8 +50,13 @@ class Command(BaseCommand):
 
         # Create Admin
         admin_role = Role.objects.get(label="admin")
-        User.objects.create_superuser(
-            username="admin", password="admin123", role=admin_role
-        )
+        if not User.objects.filter(username="admin").exists():
+            User.objects.create_superuser(
+                username="admin",
+                password="admin123",
+                role=admin_role,
+                is_staff=True,
+                is_superuser=True,
+            )
 
         self.stdout.write(self.style.SUCCESS("Database seeded successfully!"))

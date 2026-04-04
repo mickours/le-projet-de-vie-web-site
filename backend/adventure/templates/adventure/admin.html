@@ -1,0 +1,252 @@
+{% extends 'adventure/base.html' %}
+{% load static %}
+
+{% block title %}Administration - L'aventure de l'Orientation{% endblock %}
+
+{% block extra_head %}
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<!-- Section Admin Dashboard -->
+<section id="admin-section" class="panel">
+    <h2>Tableau de Bord de l'Aventure</h2>
+    <div class="admin-tabs">
+        <button class="tab-btn active" data-tab="admin-activities">Gérer les Quêtes</button>
+        <button class="tab-btn" data-tab="admin-users">Gérer les Aventuriers</button>
+        <button class="tab-btn" data-tab="admin-comments">Modération des Paroles</button>
+    </div>
+
+    <!-- Activities Tab -->
+    <div id="admin-activities" class="tab-content">
+        <div class="admin-split">
+            <div class="admin-form-col">
+                <h3 id="form-act-title">Ajouter une nouvelle quête</h3>
+                <form id="add-activity-form" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" id="act-id">
+                    <div class="form-group">
+                        <label for="act-title">Titre de la quête</label>
+                        <input type="text" id="act-title" name="title" placeholder="Ex: Découvrir les métiers du web" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="act-desc">Description</label>
+                        <div id="quill-editor" style="height: 350px; background: white;"></div>
+                        <input type="hidden" id="act-desc" name="description">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="act-logo">Logo de la quête</label>
+                        <input type="file" id="act-logo" name="logo" accept="image/*">
+                        <div id="logo-preview" class="mt-1"></div>
+                    </div>
+
+                    <div class="form-grid-profile">
+                        <div class="form-group">
+                            <label for="act-level">Niveau scolaire</label>
+                            <select id="act-level" name="level_id" required>
+                                {% for level in levels %}
+                                <option value="{{ level.id }}">{{ level.label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="act-role">Rôle concerné</label>
+                            <select id="act-role" name="role_id" required>
+                                {% for role in roles %}
+                                <option value="{{ role.id }}">{{ role.label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="act-theme">Thématique</label>
+                            <select id="act-theme" name="theme_id" required>
+                                {% for theme in themes %}
+                                <option value="{{ theme.id }}">{{ theme.label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="act-type">Type d'activité</label>
+                            <select id="act-type" name="type_id" required>
+                                {% for type in types %}
+                                <option value="{{ type.id }}">{{ type.label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                        <button type="submit" id="submit-act-btn" style="flex-grow: 1;">Sceller la quête</button>
+                        <button type="button" id="cancel-edit-btn" class="hidden" style="background: var(--bg-body); color: var(--text-body); box-shadow: 4px 4px 0 var(--border-main); border: 3px solid var(--border-main); font-weight: bold; border-radius: 8px; cursor: pointer;">Annuler</button>
+                    </div>
+                </form>
+            </div>
+            <div class="admin-list-col">
+                <h3>Quêtes existantes</h3>
+                <div id="admin-activities-list">
+                    {% for activity in activities %}
+                    <div class="admin-list-item">
+                        <div class="admin-list-item-info">
+                            {% if activity.logo_url %}
+                            <img src="{{ activity.logo_url }}" alt="Logo" class="admin-list-logo">
+                            {% endif %}
+                            <strong>{{ activity.title }}</strong>
+                            <div class="meta-badges">
+                                <span>{{ activity.level.label }}</span>
+                                <span>{{ activity.role.label }}</span>
+                                <span>{{ activity.theme.label }}</span>
+                                <span>{{ activity.type.label }}</span>
+                            </div>
+                        </div>
+                        <div class="user-action-btns">
+                            <a href="{% url 'adventure:activity_detail' activity.id %}" class="manage-btn" style="background: var(--accent-color); color: white; text-decoration: none;">Voir</a>
+                            <button class="manage-btn" onclick="editActivity({{ activity.id }})" style="background: var(--primary-color); color: white;">Modifier</button>
+                            <form action="{% url 'adventure:admin_activity_delete' activity.id %}" method="post" style="display:inline;" onsubmit="return confirm('Bannir cette quête ?')">
+                                {% csrf_token %}
+                                <button type="submit" class="delete-btn">Supprimer</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p>Aucune quête dans le grimoire.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Tab -->
+    <div id="admin-users" class="tab-content hidden">
+        <div class="admin-split">
+            <div class="admin-form-col">
+                <h3>Inscrire un nouvel Aventurier</h3>
+                <form method="post" action="{% url 'adventure:admin_user_create' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="adm-username">Nom d'aventurier</label>
+                        <input type="text" name="username" id="adm-username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adm-password">Mot de passe initial</label>
+                        <input type="password" name="password" id="adm-password" required>
+                    </div>
+                    <div class="form-grid-profile">
+                        <div class="form-group">
+                            <label for="adm-role">Rôle</label>
+                            <select name="role_id" id="adm-role" required>
+                                {% for role in roles %}
+                                <option value="{{ role.id }}">{{ role.label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="adm-level">Niveau scolaire</label>
+                            <select name="level_id" id="adm-level">
+                                <option value="">Non défini</option>
+                                {% for level in levels %}
+                                <option value="{{ level.id }}">{{ level.label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" style="width: 100%; margin-top: 1rem;">Inscrire l'aventurier</button>
+                </form>
+            </div>
+            <div class="admin-list-col">
+                <h3>Aventuriers enregistrés</h3>
+                <div id="admin-users-list" class="admin-list-container">
+                    {% for u in users_list %}
+                    <div class="admin-list-item">
+                        <div class="admin-list-item-info">
+                            <strong>{{ u.username }}</strong>
+                            <div class="meta-badges">
+                                <span>{{ u.role.label }}</span>
+                                {% if u.level %}<span>{{ u.level.label }}</span>{% endif %}
+                            </div>
+                        </div>
+                        <div class="user-action-btns">
+                            <form action="{% url 'adventure:admin_user_delete' u.id %}" method="post" style="display:inline;" onsubmit="return confirm('Bannir cet aventurier ?')">
+                                {% csrf_token %}
+                                <button type="submit" class="delete-btn">X</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comments Tab -->
+    <div id="admin-comments" class="tab-content hidden">
+        <h3>Commentaires à modérer</h3>
+        <div id="pending-comments-list">
+            {% for comment in pending_comments %}
+            <div class="moderation-card">
+                <div class="moderation-meta">
+                    <strong>{{ comment.user.username }}</strong> sur la quête <em>{{ comment.activity.title }}</em>
+                </div>
+                <div class="moderation-content">
+                    "{{ comment.content }}"
+                </div>
+                <div class="moderation-actions">
+                    <form action="{% url 'adventure:admin_comment_approve' comment.id %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="approve-btn">Approuver</button>
+                    </form>
+                    <form action="{% url 'adventure:admin_comment_delete' comment.id %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="reject-btn">Refuser</button>
+                    </form>
+                </div>
+            </div>
+            {% empty %}
+            <p>Pas de paroles en attente.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabButtons.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.add('hidden'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.remove('hidden');
+            });
+        });
+
+        var quill = new Quill('#quill-editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ 'header': [2, 3, 4, false] }],
+                    ['bold', 'italic', 'underline'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            }
+        });
+
+        quill.on('text-change', function() {
+            document.getElementById('act-desc').value = quill.root.innerHTML;
+        });
+    });
+
+    function editActivity(id) {
+        // Redirect to Django admin for complex edits
+        window.location.href = `/admin/adventure/activity/${id}/change/`;
+    }
+</script>
+{% endblock %}
