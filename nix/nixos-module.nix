@@ -108,12 +108,10 @@ in
           "${pythonEnv}/bin/python manage.py seed"
         ];
 
-        EnvironmentFile = let
-          envFiles = [
-            (mkIf (cfg.secretKeyFile != null) cfg.secretKeyFile)
-            (mkIf (cfg.tinymceApiKeyFile != null) cfg.tinymceApiKeyFile)
-          ];
-        in lib.filter (x: x != null) envFiles;
+        EnvironmentFile = lib.filter (x: x != null) [
+          cfg.secretKeyFile
+          cfg.tinymceApiKeyFile
+        ];
 
         User = "mon-projet-de-vie";
         Group = "mon-projet-de-vie";
