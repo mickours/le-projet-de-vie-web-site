@@ -102,3 +102,60 @@ La conversion doit se faire de manière itérative.
 2. Assurer la couverture des vues avec `pytest-django`.
 3. Renforcer la qualité du code via le typage avec MyPy (`django-stubs`) et `ruff`.
 
+## 5. Remplacement de l'Éditeur de Texte Riche (TinyMCE)
+
+### Constat Actuel
+L'interface d'administration personnalisée (`admin.html`) utilise actuellement **TinyMCE** pour la saisie des descriptions des quêtes (Rich Text). Bien que très performant, TinyMCE nécessite désormais une clé d'API cloud pour fonctionner sans afficher de popups d'avertissement gênants. De plus, sa version open-source devient de plus en plus difficile à configurer simplement via CDN sans compte développeur.
+
+### Technologie Recommandée : Quill.js
+Pour remplacer TinyMCE par une alternative véritablement Open Source, gratuite et ne nécessitant **aucune clé d'API**, nous recommandons **Quill.js** (License MIT). 
+
+**Pourquoi Quill.js ?**
+- **Out of the box** : Fonctionne immédiatement via CDN sans aucune inscription ni clé d'API.
+- **Copy/Paste Word** : Quill.js gère nativement le copier-coller depuis MS Word. Son module `clipboard` nettoie les balises HTML invalides générées par Word tout en conservant le formatage essentiel (gras, italique, titres, listes à puces/numérotées, liens).
+- **Léger et Moderne** : Très facile à intégrer dans notre architecture Django sans dépendances complexes.
+- **Thème "Snow"** : Fournit une barre d'outils propre et claire par défaut, adaptée à notre charte graphique.
+
+### Plan de Migration (Étape par Étape)
+
+#### Étape 1 : Retrait de TinyMCE
+1. Dans le fichier `backend/adventure/templates/adventure/admin.html`, supprimer le script CDN de TinyMCE (`https://cdn.tiny.cloud/...`).
+2. Supprimer le bloc d'initialisation JavaScript de TinyMCE (`tinymce.init({...})`).
+3. Retirer le `<textarea id="tinymce-editor"></textarea>` qui servait de conteneur d'initialisation.
+
+#### Étape 2 : Intégration de Quill.js
+1. Ajouter les CDN CSS et JS de Quill.js dans le bloc `{% block extra_js %}` de la page admin :
+   - CSS : `https://cdn.quilljs.com/1.3.7/quill.snow.css`
+   - JS : `https://cdn.quilljs.com/1.3.7/quill.min.js`
+2. Créer le nouveau conteneur pour l'éditeur : `<div id="quill-editor" style="height: 350px;"></div>`.
+3. Conserver l'input caché (`<input type="hidden" id="act-desc" name="description">`) qui servira à relayer les données texte riche vers le backend Django lors de la soumission du formulaire.
+
+#### Étape 3 : Initialisation et Configuration
+1. Dans la balise `<script>` de la page admin, initialiser Quill avec les options nécessaires pour le formatage des quêtes (notamment les entêtes et listes) :
+   ```javascript
+   var quill = new Quill('#quill-editor', {
+       theme: 'snow',
+       modules: {
+           toolbar: [
+               [{ 'header': [2, 3, 4, false] }], // Pas de H1 dans le contenu
+               ['bold', 'italic', 'underline'],
+               [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+               ['link', 'image'],
+               ['clean']
+           ]
+       }
+   });
+   ```
+
+#### Étape 4 : Synchronisation des données (Form Submit)
+1. Ajouter un événement JavaScript pour synchroniser le contenu de Quill vers l'input caché juste avant la soumission du formulaire, ou écouter les changements de texte :
+   ```javascript
+   quill.on('text-change', function() {
+       document.getElementById('act-desc').value = quill.root.innerHTML;
+   });
+   ```
+2. (Si applicable dans le futur) Lors de l'édition d'une quête existante via cette page (fonction `editActivity()`), injecter le contenu HTML depuis le backend dans l'éditeur Quill :
+   ```javascript
+   quill.root.innerHTML = activityDescriptionHtml;
+   ```
+
