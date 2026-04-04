@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (viewId === 'profile') loadProfile();
 
         if (updateHistory) {
-            const url = viewId === 'home' ? '/' : `/pages/adventure/${viewId}`;
+            const url = viewId === 'home' ? '/pages/adventure' : `/pages/adventure/${viewId}`;
             history.pushState({ viewId }, '', url);
         }
     };
@@ -442,6 +442,7 @@ ${a.logo_url ? `<img src="${a.logo_url}" alt="Logo" class="activity-card-logo">`
                     ${activity.role ? `<span class="badge badge-role">${activity.role.label}</span>` : ''}
                     ${activity.level ? `<span class="badge badge-level">${activity.level.label}</span>` : ''}
                 </div>
+                ${activity.logo_url ? `<img src="${activity.logo_url}" alt="Logo" class="activity-card-logo">` : ""}
                 <h2>${activity.title}</h2>
             </div>
             
