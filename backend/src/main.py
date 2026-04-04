@@ -749,7 +749,8 @@ async def root():
 
 
 @app.get("/pages/adventure", include_in_schema=False)
-async def serve_adventure_home():
+@app.get("/pages/adventure/{rest_of_path:path}", include_in_schema=False)
+async def serve_adventure_home(rest_of_path: str = ""):
     adventure_path = os.path.join(frontend_path, "adventure.html")
     if os.path.exists(adventure_path):
         return FileResponse(adventure_path)
