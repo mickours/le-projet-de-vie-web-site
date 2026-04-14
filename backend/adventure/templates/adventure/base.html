@@ -71,10 +71,7 @@
         <p>&copy; 2026 L'aventure de l'Orientation - <span id="current-role">{% if user.is_authenticated %}{{ user.role.label }}{% else %}Visiteur{% endif %}</span></p>
         <div style="margin-top: 1rem; display: flex; justify-content: center; gap: 1.5rem; font-size: 0.9rem;">
             <a href="{% url 'adventure:home' %}" style="color: #666; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#000'" onmouseout="this.style.color='#666'">Retour à l'accueil</a>
-            {% if user.is_staff %}
-            <a href="{% url 'adventure:admin_dashboard' %}" style="color: #666; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#000'" onmouseout="this.style.color='#666'">Tableau de Bord Admin</a>
-            {% endif %}
-            <a href="/admin" style="color: #666; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#000'" onmouseout="this.style.color='#666'">Administration Django</a>
+            <a href="{% url 'adventure:admin_dashboard' %}" style="color: #666; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#000'" onmouseout="this.style.color='#666'">Administration</a>
         </div>
     </footer>
 
