@@ -83,11 +83,13 @@ in
         after = [ "network.target" ];
         wantedBy = [ "multi-user.target" ];
 
-        environment = {
+        environment = let
+          allHosts = cfg.allowedOrigins ++ lib.optional cfg.nginx.enable cfg.nginx.hostName;
+        in {
           DATABASE_PATH = "${cfg.dataDir}/db.sqlite3";
-          ALLOWED_HOSTS = builtins.concatStringsSep "," cfg.allowedOrigins;
+          ALLOWED_HOSTS = builtins.concatStringsSep "," allHosts;
           CSRF_TRUSTED_ORIGINS = builtins.concatStringsSep "," (
-            builtins.map (h: "https://" + h) (builtins.filter (h: h != "*") cfg.allowedOrigins)
+            builtins.map (h: "https://" + h) (builtins.filter (h: h != "*") allHosts)
           );
           STATIC_ROOT = "${cfg.dataDir}/staticfiles";
           DEBUG = "False";
