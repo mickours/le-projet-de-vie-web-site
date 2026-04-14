@@ -11,3 +11,4 @@ Requires-Dist: mypy>=1.19.1
 Requires-Dist: pytest>=8.0.0
 Requires-Dist: pytest-django>=4.11.1
 Requires-Dist: ruff>=0.15.6
+Requires-Dist: whitenoise>=6.6.0
