@@ -1,6 +1,6 @@
 # Proposition d'Implémentation Technique
 
-Ce document détaille l'architecture et les choix techniques pour le site "Mon Projet de Vie".
+Ce document détaille l'architecture et les choix techniques pour le site "Le Projet de Vie".
 
 ## 1. Stack Technique Réalisée
 

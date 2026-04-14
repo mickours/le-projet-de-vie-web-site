@@ -79,4 +79,4 @@ uv run gunicorn src.main:app --workers 4 --worker-class uvicorn.workers.UvicornW
 
 ### Dossiers importants
 - `backend/uploads/` : Contient les fichiers joints aux activités. Assurez-vous que le processus a les droits d'écriture.
-- `backend/src/monprojetdevie.db` : Fichier de base de données SQLite. À sauvegarder régulièrement.
+- `backend/src/leprojetdevie.db` : Fichier de base de données SQLite. À sauvegarder régulièrement.

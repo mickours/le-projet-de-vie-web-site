@@ -40,7 +40,7 @@ python3.pkgs.buildPythonApplication rec {
 
   meta = with lib; {
     description = "L'aventure de l'Orientation - Manga-style educational platform";
-    homepage = "https://github.com/mickours/mon-projet-de-vie-web-site";
+    homepage = "https://github.com/mickours/le-projet-de-vie-web-site";
     license = licenses.mit;
   };
 }

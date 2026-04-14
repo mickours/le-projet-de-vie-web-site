@@ -1,7 +1,7 @@
 backend/uploads
-backend/monprojetdevie.db
-backend/src/monprojetdevie.db
+backend/leprojetdevie.db
+backend/src/leprojetdevie.db
 *__pycache__*
-backend/src/monprojetdevie.db
+backend/src/leprojetdevie.db
 frontend/node_modules
 result

@@ -1,6 +1,6 @@
 # Guide de Mise en Production
 
-Ce document détaille les étapes et les bonnes pratiques pour déployer "Mon Projet de Vie" dans un environnement de production.
+Ce document détaille les étapes et les bonnes pratiques pour déployer "Le Projet de Vie" dans un environnement de production.
 
 ## 1. Architecture recommandée
 
@@ -22,7 +22,7 @@ L'application utilise `pydantic-settings` pour lire sa configuration. Vous pouve
 
 ### Exemple de fichier `.env`
 ```env
-DATABASE_URL=postgresql://user:pass@localhost/monprojetdevie
+DATABASE_URL=postgresql://user:pass@localhost/leprojetdevie
 SECRET_KEY=votre_cle_secrete_tres_longue_et_aleatoire
 ALLOWED_ORIGINS=["https://votre-domaine.fr"]
 ```
@@ -73,5 +73,5 @@ Il est impératif d'utiliser HTTPS. Configurez votre reverse proxy (Nginx) pour 
 FastAPI utilise les logs standards de Python. En production, redirigez ces logs vers un fichier ou un service de centralisation :
 
 ```bash
-uv run gunicorn main:app ... >> /var/log/monprojetdevie.log 2>&1
+uv run gunicorn main:app ... >> /var/log/leprojetdevie.log 2>&1
 ```

@@ -131,7 +131,7 @@ wheels = [
 ]
 
 [[package]]
-name = "mon-projet-de-vie"
+name = "le-projet-de-vie"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

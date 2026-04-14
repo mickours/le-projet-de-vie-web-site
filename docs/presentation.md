@@ -1,4 +1,4 @@
-# Mon projet de vie me libère
+# Le projet de vie me libère
 
 Le projet de vie est la mise en acte de la liberté existentielle : notre capacité à donner un sens à notre vie, quelles que soient les circonstances.
 Il permet de transformer nos envies en une vie réellement choisie.

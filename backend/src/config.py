@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Get the base directory for default SQLite path
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DEFAULT_DB_PATH = os.path.join(BASE_DIR, "monprojetdevie.db")
+DEFAULT_DB_PATH = os.path.join(BASE_DIR, "leprojetdevie.db")
 
 
 class Settings(BaseSettings):
@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     UPLOADS_PATH: Optional[str] = None
 
     # Authentication Settings
-    SECRET_KEY: str = "mon-projet-de-vie-super-secret-key"
+    SECRET_KEY: str = "le-projet-de-vie-super-secret-key"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
