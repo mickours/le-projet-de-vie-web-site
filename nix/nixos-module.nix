@@ -86,7 +86,9 @@ in
         environment = {
           DATABASE_PATH = "${cfg.dataDir}/db.sqlite3";
           ALLOWED_HOSTS = builtins.concatStringsSep "," cfg.allowedOrigins;
-          CSRF_TRUSTED_ORIGINS = builtins.concatStringsSep "," (builtins.map (h: "https://" + h) (builtins.filter (h: h != "*") cfg.allowedOrigins));
+          CSRF_TRUSTED_ORIGINS = builtins.concatStringsSep "," (
+            builtins.map (h: "https://" + h) (builtins.filter (h: h != "*") cfg.allowedOrigins)
+          );
           STATIC_ROOT = "${cfg.dataDir}/staticfiles";
           DEBUG = "False";
         };
@@ -108,7 +110,6 @@ in
 
           EnvironmentFile = lib.filter (x: x != null) [
             cfg.secretKeyFile
-            cfg.tinymceApiKeyFile
           ];
 
           User = "le-projet-de-vie";
