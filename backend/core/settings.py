@@ -141,3 +141,5 @@ LOGIN_REDIRECT_URL = "adventure:dashboard"
 LOGOUT_REDIRECT_URL = "adventure:home"
 
 STATIC_ROOT = os.environ.get("STATIC_ROOT", BASE_DIR / "staticfiles")
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
