@@ -14,6 +14,7 @@ from .models import (
     UserActivity,
     Comment,
     User,
+    Document,
 )
 
 
@@ -167,14 +168,26 @@ def profile(request):
 @staff_member_required
 def admin_dashboard(request):
     if request.method == "POST":
-        Activity.objects.create(
+        activity = Activity.objects.create(
             title=request.POST.get("title"),
             description=request.POST.get("description"),
-            level_id=request.POST.get("level_id"),
-            role_id=request.POST.get("role_id"),
-            theme_id=request.POST.get("theme_id"),
-            type_id=request.POST.get("type_id"),
+            level_id=request.POST.get("level_id") or None,
+            role_id=request.POST.get("role_id") or None,
+            theme_id=request.POST.get("theme_id") or None,
+            type_id=request.POST.get("type_id") or None,
+            video_url=request.POST.get("video_url"),
+            logo=request.FILES.get("logo"),
+            video_file=request.FILES.get("video_file")
         )
+        
+        for f in request.FILES.getlist("documents"):
+            Document.objects.create(
+                activity=activity,
+                filename=f.name,
+                file=f,
+                doc_type="pdf"
+            )
+            
         return redirect("adventure:admin_dashboard")
 
     return render(

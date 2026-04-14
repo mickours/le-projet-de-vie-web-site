@@ -14,7 +14,9 @@
                 {% if activity.role %}<span class="badge badge-role">{{ activity.role.label }}</span>{% endif %}
                 {% if activity.level %}<span class="badge badge-level">{{ activity.level.label }}</span>{% endif %}
             </div>
-            {% if activity.logo_url %}
+            {% if activity.logo %}
+            <img src="{{ activity.logo.url }}" alt="Logo" class="activity-card-logo">
+            {% elif activity.logo_url %}
             <img src="{{ activity.logo_url }}" alt="Logo" class="activity-card-logo">
             {% endif %}
             <h2>{{ activity.title }}</h2>
@@ -33,12 +35,23 @@
             </div>
             {% endif %}
             
+            {% if activity.video_file %}
+            <div class="video-section">
+                <div class="video-container">
+                    <video width="100%" controls>
+                        <source src="{{ activity.video_file.url }}" type="video/mp4">
+                        Votre navigateur ne supporte pas la vidéo.
+                    </video>
+                </div>
+            </div>
+            {% endif %}
+            
             {% if activity.documents.all %}
             <div class="documents-section-box">
                 <h4><span class="icon">📂</span> Documents pour l'aventure :</h4>
                 <div class="button-cloud" style="justify-content: flex-start; margin-top: 1rem;">
                     {% for doc in activity.documents.all %}
-                    <a href="{{ doc.url }}" target="_blank" class="cloud-btn" style="min-width: auto; flex-direction: row; padding: 0.8rem 1.2rem;">
+                    <a href="{% if doc.file %}{{ doc.file.url }}{% else %}{{ doc.url }}{% endif %}" target="_blank" class="cloud-btn" style="min-width: auto; flex-direction: row; padding: 0.8rem 1.2rem;">
                         <span style="font-size: 1.5rem;">📄</span> {{ doc.filename }}
                     </a>
                     {% endfor %}

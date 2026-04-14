@@ -26,6 +26,7 @@ python3.pkgs.buildPythonApplication rec {
     pytest
     pytest-django
     mypy
+    pillow
     ruff
     whitenoise
   ];

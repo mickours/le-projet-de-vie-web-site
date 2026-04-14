@@ -31,7 +31,9 @@
                         {% if activity.role %}<span class="badge badge-role">{{ activity.role.label }}</span>{% endif %}
                         {% if activity.level %}<span class="badge badge-level">{{ activity.level.label }}</span>{% endif %}
                     </div>
-                    {% if activity.logo_url %}
+                    {% if activity.logo %}
+                    <img src="{{ activity.logo.url }}" alt="Logo" class="activity-card-logo">
+                    {% elif activity.logo_url %}
                     <img src="{{ activity.logo_url }}" alt="Logo" class="activity-card-logo">
                     {% endif %}
                     <h3>{{ activity.title }}</h3>
