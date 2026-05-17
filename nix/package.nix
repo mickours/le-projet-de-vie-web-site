@@ -8,11 +8,7 @@ python3.pkgs.buildPythonApplication rec {
   version = "0.1.0";
   format = "pyproject";
 
-  srcs = [
-    ../backend
-  ];
-
-  sourceRoot = "backend";
+  src = ../backend;
 
   nativeBuildInputs = with python3.pkgs; [
     setuptools
@@ -21,13 +17,8 @@ python3.pkgs.buildPythonApplication rec {
 
   propagatedBuildInputs = with python3.pkgs; [
     django
-    django-stubs
     gunicorn
-    pytest
-    pytest-django
-    mypy
     pillow
-    ruff
     whitenoise
   ];
 

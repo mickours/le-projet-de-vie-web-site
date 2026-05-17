@@ -76,6 +76,7 @@ in
           p.django
           p.gunicorn
           p.whitenoise
+          p.pillow
         ]);
       in
       {
@@ -92,6 +93,7 @@ in
             builtins.map (h: "https://" + h) (builtins.filter (h: h != "*") allHosts)
           );
           STATIC_ROOT = "${cfg.dataDir}/staticfiles";
+          MEDIA_ROOT = "${cfg.dataDir}/media";
           DEBUG = "False";
         };
 
@@ -103,7 +105,7 @@ in
           StateDirectory = "le-projet-de-vie";
           # Ensure the directories exist, run migrations, collectstatic and seed the database
           ExecStartPre = [
-            "+${pkgs.coreutils}/bin/mkdir -p ${cfg.dataDir}/staticfiles"
+            "+${pkgs.coreutils}/bin/mkdir -p ${cfg.dataDir}/staticfiles ${cfg.dataDir}/media"
             "+${pkgs.coreutils}/bin/chown -R le-projet-de-vie:le-projet-de-vie ${cfg.dataDir}"
             "${pythonEnv}/bin/python manage.py migrate --noinput"
             "${pythonEnv}/bin/python manage.py collectstatic --noinput"
